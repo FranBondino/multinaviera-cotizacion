@@ -67,7 +67,7 @@ export default function MulticotizadorHome() {
       <header style={{
         display: 'flex',
         alignItems: 'center',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         paddingBottom: '1.75rem',
         borderBottom: '1px solid var(--border-subtle)',
         marginBottom: '2rem'
@@ -76,29 +76,28 @@ export default function MulticotizadorHome() {
           <div style={{
             width: '48px',
             height: '48px',
-            background: 'linear-gradient(135deg, #2563eb, #0891b2)',
-            borderRadius: '14px',
+            background: 'var(--text-main)',
+            borderRadius: '12px',
             display: 'flex',
             alignItems: 'center',
-            justify: 'center',
+            justifyContent: 'center',
             fontWeight: '800',
             fontSize: '1.5rem',
-            color: 'white',
-            boxShadow: '0 6px 20px rgba(37, 99, 235, 0.4)'
+            color: 'var(--bg-dark)'
           }}>
             A
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <h1 style={{ fontSize: '1.4rem', fontWeight: '700', color: 'white', letterSpacing: '-0.5px' }}>Almar Rosario</h1>
+              <h1 style={{ fontSize: '1.4rem', fontWeight: '700', color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Almar Rosario</h1>
               <span style={{
-                background: 'rgba(59, 130, 246, 0.15)',
-                color: 'var(--primary)',
+                background: '#111111',
+                color: 'var(--text-main)',
                 fontSize: '0.75rem',
                 fontWeight: '600',
                 padding: '0.2rem 0.6rem',
                 borderRadius: '6px',
-                border: '1px solid rgba(59, 130, 246, 0.3)'
+                border: '1px solid var(--border-subtle)'
               }}>FREIGHT ENGINE v2.5</span>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Plataforma Inteligente de Cotización & Tarifario Multinaviera UN/LOCODE Global</p>
@@ -107,13 +106,13 @@ export default function MulticotizadorHome() {
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <div className="pulse" style={{
-            background: 'rgba(16, 185, 129, 0.12)',
+            background: 'rgba(40, 167, 69, 0.1)',
             color: 'var(--success)',
             padding: '0.5rem 1rem',
             borderRadius: '30px',
             fontSize: '0.8rem',
             fontWeight: '600',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
+            border: '1px solid rgba(40, 167, 69, 0.2)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
@@ -121,7 +120,7 @@ export default function MulticotizadorHome() {
             <span>●</span> Base Global UN/LOCODE Activa
           </div>
           {lastUpdated && (
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', background: '#111111', padding: '0.5rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
               ⏱️ Refrescado: {lastUpdated}
             </span>
           )}
@@ -129,25 +128,26 @@ export default function MulticotizadorHome() {
       </header>
 
       {/* Interactive Flow Indicator Banner */}
-      <div className="glass-panel" style={{ padding: '1.5rem 2rem', marginBottom: '2rem', background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.5))' }}>
+      <div className="glass-panel" style={{ padding: '1.5rem 2rem', marginBottom: '2rem', background: 'var(--bg-card)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-            <div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600' }}>PUERTO ORIGEN (POL)</span>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'white' }}>{polObj.name} <span style={{ fontSize: '1rem', fontWeight: '400' }}>({polObj.country})</span></h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+            <div style={{ textAlign: 'right' }}>
+              <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600', marginBottom: '0.2rem' }}>ORIGEN (POL)</span>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>{polObj.name} <span style={{ fontSize: '1rem', fontWeight: '400', color: 'var(--text-dim)' }}>({polObj.country})</span></h2>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 1rem' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: '600', marginBottom: '0.2rem' }}>RUTA MARÍTIMA DIRECTA</span>
-              <div style={{ width: '120px', height: '2px', background: 'linear-gradient(90deg, var(--primary), var(--accent-cyan))', position: 'relative' }}>
-                <span style={{ position: 'absolute', top: '-10px', left: '45%', fontSize: '1.1rem' }}>🚢</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600', marginBottom: '0.5rem' }}>RUTA MARÍTIMA DIRECTA</span>
+              <div style={{ width: '140px', height: '2px', background: 'var(--border-subtle)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '1.2rem', background: 'var(--bg-card)', padding: '0 0.5rem', zIndex: 1 }}>🚢</span>
+                <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '50%', background: 'var(--text-muted)' }}></div>
               </div>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>{equipment}</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem', fontWeight: '500' }}>{equipment}</span>
             </div>
 
             <div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600' }}>PUERTO DESTINO (POD)</span>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'white' }}>{podObj.name} <span style={{ fontSize: '1rem', fontWeight: '400' }}>({podObj.country})</span></h2>
+              <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600', marginBottom: '0.2rem' }}>DESTINO (POD)</span>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>{podObj.name} <span style={{ fontSize: '1rem', fontWeight: '400', color: 'var(--text-dim)' }}>({podObj.country})</span></h2>
             </div>
           </div>
 
@@ -158,7 +158,7 @@ export default function MulticotizadorHome() {
               className="btn-primary"
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              {loading ? '🔄 Buscando Fletes en Vivo...' : '🔍 Buscar Cotizaciones en Vivo'}
+              {loading ? '🔄 Buscando...' : '🔍 Buscar Cotizaciones en Vivo'}
             </button>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function MulticotizadorHome() {
 
       {/* Control Filters Section */}
       <div className="glass-panel" style={{ padding: '1.75rem', marginBottom: '2rem' }}>
-        <h3 style={{ fontSize: '1.05rem', color: 'var(--primary)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <h3 style={{ fontSize: '1.05rem', color: 'var(--text-main)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span>⚙️</span> Buscador de Puertos Mundiales (UN/LOCODE) & Margen
         </h3>
 
@@ -230,7 +230,7 @@ export default function MulticotizadorHome() {
         {/* Sorting controls */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '1rem' }}>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Comparando <strong style={{ color: 'white' }}>4 Navieras Líderes</strong> para {polObj.name} ➔ {podObj.name}
+            Comparando <strong style={{ color: 'var(--text-main)' }}>4 Navieras Líderes</strong> para {polObj.name} ➔ {podObj.name}
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Ordenar por:</span>
@@ -260,7 +260,7 @@ export default function MulticotizadorHome() {
       {loading && (
         <div className="glass-panel" style={{ textAlign: 'center', padding: '4rem 2rem', marginBottom: '2rem' }}>
           <div className="pulse" style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚢 ⚡</div>
-          <h3 style={{ color: 'var(--accent-cyan)', fontSize: '1.4rem', fontWeight: '700', marginBottom: '0.5rem' }}>Consultando Tarifas e Itinerarios en Vivo...</h3>
+          <h3 style={{ color: 'var(--text-main)', fontSize: '1.4rem', fontWeight: '700', marginBottom: '0.5rem' }}>Consultando Tarifas e Itinerarios en Vivo...</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             Conectando con servidores y scrapers de Maersk, CMA CGM, Hapag-Lloyd y MSC...
           </p>
@@ -286,14 +286,13 @@ export default function MulticotizadorHome() {
                   position: 'absolute',
                   top: '0',
                   right: '0',
-                  background: 'linear-gradient(135deg, #10b981, #059669)',
-                  color: '#fff',
+                  background: 'var(--success)',
+                  color: 'var(--bg-dark)',
                   fontSize: '0.75rem',
                   fontWeight: '700',
                   padding: '0.35rem 1rem',
                   borderBottomLeftRadius: '12px',
-                  letterSpacing: '0.5px',
-                  boxShadow: '0 4px 10px rgba(16, 185, 129, 0.4)'
+                  letterSpacing: '0.5px'
                 }}>
                   ⭐ MEJOR OPCIÓN ({sortBy === 'price' ? 'PRECIO' : sortBy === 'transit' ? 'TRÁNSITO' : 'SALIDA'})
                 </span>
@@ -307,18 +306,18 @@ export default function MulticotizadorHome() {
                       width: '42px',
                       height: '42px',
                       borderRadius: '10px',
-                      background: 'rgba(255,255,255,0.05)',
+                      background: '#111111',
                       display: 'flex',
                       alignItems: 'center',
-                      justify: 'center',
+                      justifyContent: 'center',
                       fontSize: '1.8rem',
                       border: '1px solid var(--border-subtle)'
                     }}>
                       {rate.logo}
                     </div>
                     <div>
-                      <h3 style={{ fontSize: '1.35rem', fontWeight: '700', color: 'white', letterSpacing: '-0.3px' }}>{rate.carrier}</h3>
-                      <span style={{ fontSize: '0.75rem', color: rate.accentColor, fontWeight: '600', background: 'rgba(255,255,255,0.04)', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+                      <h3 style={{ fontSize: '1.35rem', fontWeight: '700', color: 'var(--text-main)', letterSpacing: '-0.3px' }}>{rate.carrier}</h3>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600', background: '#111111', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border-subtle)' }}>
                         {rate.serviceName}
                       </span>
                     </div>
@@ -327,26 +326,26 @@ export default function MulticotizadorHome() {
 
                 {/* Itinerary Timeline */}
                 <div style={{
-                  background: 'rgba(15, 23, 42, 0.6)',
+                  background: '#111111',
                   padding: '1rem',
                   borderRadius: '12px',
                   marginBottom: '1.25rem',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  border: '1px solid var(--border-subtle)',
                   fontSize: '0.85rem'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Tiempo Tránsito:</span>
-                    <strong style={{ color: 'var(--accent-cyan)', fontWeight: '700' }}>⚡ {rate.transitDays} días directos</strong>
+                    <strong style={{ color: 'var(--text-main)', fontWeight: '700' }}>⚡ {rate.transitDays} días directos</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Salida ETD:</span>
-                    <strong style={{ color: 'white' }}>📅 {rate.etd}</strong>
+                    <strong style={{ color: 'var(--text-main)' }}>📅 {rate.etd}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Llegada ETA:</span>
-                    <strong style={{ color: 'white' }}>🏁 {rate.eta}</strong>
+                    <strong style={{ color: 'var(--text-main)' }}>🏁 {rate.eta}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)', fontSize: '0.78rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.4rem', borderTop: '1px solid var(--border-subtle)', fontSize: '0.78rem' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Buque / Viaje:</span>
                     <span style={{ color: 'var(--text-main)', fontWeight: '500' }}>{rate.vessel}</span>
                   </div>
@@ -356,19 +355,19 @@ export default function MulticotizadorHome() {
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
                     <span>Flete Base Ocean Freight:</span>
-                    <span style={{ color: 'white' }}>USD {rate.baseFreight}</span>
+                    <span style={{ color: 'var(--text-main)' }}>USD {rate.baseFreight}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
                     <span>THC (Terminal Handling):</span>
-                    <span style={{ color: 'white' }}>USD {rate.thc}</span>
+                    <span style={{ color: 'var(--text-main)' }}>USD {rate.thc}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
                     <span>BAF Fuel Surcharge:</span>
-                    <span style={{ color: 'white' }}>USD {rate.baf}</span>
+                    <span style={{ color: 'var(--text-main)' }}>USD {rate.baf}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '1px dashed var(--border-subtle)', fontWeight: '600', color: 'var(--text-main)' }}>
                     <span>Costo Neto Almar:</span>
-                    <span style={{ color: 'var(--accent-cyan)' }}>USD {rate.totalCost}</span>
+                    <span style={{ color: 'var(--text-main)' }}>USD {rate.totalCost}</span>
                   </div>
                 </div>
               </div>
@@ -381,13 +380,13 @@ export default function MulticotizadorHome() {
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.6rem' }}>
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '500' }}>Precio Cliente:</span>
-                  <span style={{ fontSize: '1.65rem', fontWeight: '800', color: 'var(--success)', letterSpacing: '-0.5px' }}>
+                  <span style={{ fontSize: '1.65rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
                     USD {rate.clientPrice}
                   </span>
                 </div>
 
-                <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ background: 'rgba(6, 182, 212, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ background: '#111111', padding: '0.3rem 0.6rem', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
                     Ganancia Neto Almar: +USD {rate.margin}
                   </span>
                   <span style={{ color: 'var(--text-dim)' }}>{rate.status}</span>
@@ -414,11 +413,11 @@ export default function MulticotizadorHome() {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'rgba(3, 7, 18, 0.85)',
-          backdropFilter: 'blur(12px)',
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(8px)',
           display: 'flex',
           alignItems: 'center',
-          justify: 'center',
+          justifyContent: 'center',
           padding: '1.5rem',
           zIndex: 1000
         }}>
@@ -436,7 +435,7 @@ export default function MulticotizadorHome() {
                 position: 'absolute',
                 top: '20px',
                 right: '20px',
-                background: 'rgba(255,255,255,0.05)',
+                background: '#111111',
                 border: '1px solid var(--border-subtle)',
                 color: 'var(--text-muted)',
                 borderRadius: '8px',
@@ -444,7 +443,7 @@ export default function MulticotizadorHome() {
                 height: '32px',
                 display: 'flex',
                 alignItems: 'center',
-                justify: 'center',
+                justifyContent: 'center',
                 cursor: 'pointer'
               }}
             >
@@ -452,17 +451,17 @@ export default function MulticotizadorHome() {
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-              <div style={{ width: '36px', height: '36px', background: 'var(--primary)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: 'white' }}>
+              <div style={{ width: '36px', height: '36px', background: 'var(--text-main)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: 'var(--bg-dark)' }}>
                 A
               </div>
               <div>
-                <h3 style={{ fontSize: '1.3rem', fontWeight: '700', color: 'white' }}>Propuesta Comercial de Flete</h3>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-main)' }}>Propuesta Comercial de Flete</h3>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Almar Rosario Logistics Intelligence</p>
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.8)', padding: '1.5rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: '1.7', marginBottom: '1.75rem', color: 'var(--text-main)', border: '1px solid var(--border-subtle)' }}>
-              <p style={{ fontWeight: '700', color: 'var(--primary)', marginBottom: '0.75rem', fontSize: '0.95rem' }}>
+            <div style={{ background: '#111111', padding: '1.5rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: '1.7', marginBottom: '1.75rem', color: 'var(--text-main)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.75rem', fontSize: '0.95rem' }}>
                 🚢 ALMAR ROSARIO - OFERTA DE FLETE MARÍTIMO
               </p>
               <p>📍 <strong>Origen (POL):</strong> {polObj.name} ({polObj.country})</p>
@@ -473,7 +472,7 @@ export default function MulticotizadorHome() {
               <p>📅 <strong>ETD (Salida Estimada):</strong> {selectedQuoteModal.etd}</p>
               <p>🏁 <strong>ETA (Llegada Estimada):</strong> {selectedQuoteModal.eta}</p>
               <hr style={{ border: 'none', borderTop: '1px dashed var(--border-subtle)', margin: '1rem 0' }} />
-              <p style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--success)' }}>
+              <p style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)' }}>
                 💵 TARIFA CLIENTE: USD {selectedQuoteModal.clientPrice} / Contenedor
               </p>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
