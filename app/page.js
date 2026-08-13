@@ -1,46 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-const PORTS = [
-  // Asia / China
-  { code: 'CNSHA', name: 'Shanghai', country: 'China 🇨🇳', region: 'Asia' },
-  { code: 'CNNBO', name: 'Ningbo', country: 'China 🇨🇳', region: 'Asia' },
-  { code: 'CNSHK', name: 'Shekou / Shenzhen', country: 'China 🇨🇳', region: 'Asia' },
-  { code: 'CNTAO', name: 'Qingdao', country: 'China 🇨🇳', region: 'Asia' },
-  { code: 'CNXMN', name: 'Xiamen', country: 'China 🇨🇳', region: 'Asia' },
-  { code: 'HKHKG', name: 'Hong Kong', country: 'Hong Kong 🇭🇰', region: 'Asia' },
-  { code: 'KRPUS', name: 'Busan', country: 'Corea del Sur 🇰🇷', region: 'Asia' },
-  { code: 'SGSIN', name: 'Singapore', country: 'Singapur 🇸🇬', region: 'Asia' },
-  { code: 'MYPKG', name: 'Port Klang', country: 'Malasia 🇲🇾', region: 'Asia' },
-  
-  // Sudamérica (ECSA / WCSA)
-  { code: 'BUE', name: 'Buenos Aires', country: 'Argentina 🇦🇷', region: 'Sudamérica' },
-  { code: 'ROS', name: 'Rosario', country: 'Argentina 🇦🇷', region: 'Sudamérica' },
-  { code: 'ZAR', name: 'Zárate', country: 'Argentina 🇦🇷', region: 'Sudamérica' },
-  { code: 'SSZ', name: 'Santos', country: 'Brasil 🇧🇷', region: 'Sudamérica' },
-  { code: 'PNG', name: 'Paranaguá', country: 'Brasil 🇧🇷', region: 'Sudamérica' },
-  { code: 'RIG', name: 'Rio Grande', country: 'Brasil 🇧🇷', region: 'Sudamérica' },
-  { code: 'MVD', name: 'Montevideo', country: 'Uruguay 🇺🇾', region: 'Sudamérica' },
-  { code: 'VAP', name: 'Valparaíso', country: 'Chile 🇨🇱', region: 'Sudamérica' },
-  { code: 'CALL', name: 'Callao', country: 'Perú 🇵🇪', region: 'Sudamérica' },
-  
-  // Europa
-  { code: 'NLRTM', name: 'Rotterdam', country: 'Países Bajos 🇳🇱', region: 'Europa' },
-  { code: 'DEHAM', name: 'Hamburgo', country: 'Alemania 🇩🇪', region: 'Europa' },
-  { code: 'BEANR', name: 'Amberes (Antwerp)', country: 'Bélgica 🇧🇪', region: 'Europa' },
-  { code: 'ESVLC', name: 'Valencia', country: 'España 🇪🇸', region: 'Europa' },
-  { code: 'ESBCN', name: 'Barcelona', country: 'España 🇪🇸', region: 'Europa' },
-  { code: 'ITGOA', name: 'Génova', country: 'Italia 🇮🇹', region: 'Europa' },
-  
-  // Norteamérica / Centroamérica
-  { code: 'USMIA', name: 'Miami', country: 'EEUU 🇺🇸', region: 'Norteamérica' },
-  { code: 'USNYC', name: 'New York', country: 'EEUU 🇺🇸', region: 'Norteamérica' },
-  { code: 'USLAX', name: 'Los Angeles', country: 'EEUU 🇺🇸', region: 'Norteamérica' },
-  { code: 'USHOU', name: 'Houston', country: 'EEUU 🇺🇸', region: 'Norteamérica' },
-  { code: 'MXZLO', name: 'Manzanillo', country: 'México 🇲🇽', region: 'Norteamérica' },
-  { code: 'PABLB', name: 'Balboa / Cristóbal', country: 'Panamá 🇵🇦', region: 'Centroamérica' }
-];
+import { GLOBAL_PORTS } from '../lib/portsData';
+import PortSelect from '../components/PortSelect';
 
 export default function MulticotizadorHome() {
   const [pol, setPol] = useState('CNSHA');
@@ -76,8 +38,8 @@ export default function MulticotizadorHome() {
     fetchQuotes();
   }, [pol, pod, equipment]);
 
-  const polObj = PORTS.find(p => p.code === pol) || { name: pol, country: '' };
-  const podObj = PORTS.find(p => p.code === pod) || { name: pod, country: '' };
+  const polObj = GLOBAL_PORTS.find(p => p.code === pol) || { name: pol, country: '' };
+  const podObj = GLOBAL_PORTS.find(p => p.code === pod) || { name: pod, country: '' };
 
   const processedRates = ratesData.map(rate => {
     const totalCost = rate.baseFreight + rate.thc + rate.baf;
@@ -137,9 +99,9 @@ export default function MulticotizadorHome() {
                 padding: '0.2rem 0.6rem',
                 borderRadius: '6px',
                 border: '1px solid rgba(59, 130, 246, 0.3)'
-              }}>FREIGHT ENGINE v2.0</span>
+              }}>FREIGHT ENGINE v2.5</span>
             </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Plataforma Inteligente de Cotización & Tarifario Multinaviera</p>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Plataforma Inteligente de Cotización & Tarifario Multinaviera UN/LOCODE Global</p>
           </div>
         </div>
 
@@ -156,7 +118,7 @@ export default function MulticotizadorHome() {
             alignItems: 'center',
             gap: '0.5rem'
           }}>
-            <span>●</span> Conectado a APIs DCSA & Web Scraping Live
+            <span>●</span> Base Global UN/LOCODE Activa
           </div>
           {lastUpdated && (
             <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
@@ -205,75 +167,23 @@ export default function MulticotizadorHome() {
       {/* Control Filters Section */}
       <div className="glass-panel" style={{ padding: '1.75rem', marginBottom: '2rem' }}>
         <h3 style={{ fontSize: '1.05rem', color: 'var(--primary)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span>⚙️</span> Configuración de Parámetros & Margen Comercial
+          <span>⚙️</span> Buscador de Puertos Mundiales (UN/LOCODE) & Margen
         </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
-          {/* POL Selector */}
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: '500' }}>
-              Puerto de Origen (POL):
-            </label>
-            <select
-              value={pol}
-              onChange={e => setPol(e.target.value)}
-              className="select-input"
-            >
-              <optgroup label="🌏 Asia / China">
-                {PORTS.filter(p => p.region === 'Asia').map(p => (
-                  <option key={p.code} value={p.code}>{p.name} - {p.country} ({p.code})</option>
-                ))}
-              </optgroup>
-              <optgroup label="🌍 Europa">
-                {PORTS.filter(p => p.region === 'Europa').map(p => (
-                  <option key={p.code} value={p.code}>{p.name} - {p.country} ({p.code})</option>
-                ))}
-              </optgroup>
-              <optgroup label="🌎 Sudamérica (ECSA/WCSA)">
-                {PORTS.filter(p => p.region === 'Sudamérica').map(p => (
-                  <option key={p.code} value={p.code}>{p.name} - {p.country} ({p.code})</option>
-                ))}
-              </optgroup>
-              <optgroup label="🌎 Norteamérica & Centroamérica">
-                {PORTS.filter(p => p.region === 'Norteamérica' || p.region === 'Centroamérica').map(p => (
-                  <option key={p.code} value={p.code}>{p.name} - {p.country} ({p.code})</option>
-                ))}
-              </optgroup>
-            </select>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
+          {/* POL Search Select */}
+          <PortSelect
+            label="Puerto de Origen (POL):"
+            value={pol}
+            onChange={setPol}
+          />
 
-          {/* POD Selector */}
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: '500' }}>
-              Puerto de Destino (POD):
-            </label>
-            <select
-              value={pod}
-              onChange={e => setPod(e.target.value)}
-              className="select-input"
-            >
-              <optgroup label="🌎 Sudamérica (ECSA/WCSA)">
-                {PORTS.filter(p => p.region === 'Sudamérica').map(p => (
-                  <option key={p.code} value={p.code}>{p.name} - {p.country} ({p.code})</option>
-                ))}
-              </optgroup>
-              <optgroup label="🌏 Asia / China">
-                {PORTS.filter(p => p.region === 'Asia').map(p => (
-                  <option key={p.code} value={p.code}>{p.name} - {p.country} ({p.code})</option>
-                ))}
-              </optgroup>
-              <optgroup label="🌍 Europa">
-                {PORTS.filter(p => p.region === 'Europa').map(p => (
-                  <option key={p.code} value={p.code}>{p.name} - {p.country} ({p.code})</option>
-                ))}
-              </optgroup>
-              <optgroup label="🌎 Norteamérica & Centroamérica">
-                {PORTS.filter(p => p.region === 'Norteamérica' || p.region === 'Centroamérica').map(p => (
-                  <option key={p.code} value={p.code}>{p.name} - {p.country} ({p.code})</option>
-                ))}
-              </optgroup>
-            </select>
-          </div>
+          {/* POD Search Select */}
+          <PortSelect
+            label="Puerto de Destino (POD):"
+            value={pod}
+            onChange={setPod}
+          />
 
           {/* Equipment Selector */}
           <div>
