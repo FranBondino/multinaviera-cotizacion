@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchAllCarrierRates } from '../../../lib/scrapers';
+import { calculateCarrierRates } from '../../../lib/ratesEngine';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -8,7 +8,7 @@ export async function GET(request) {
   const equipment = searchParams.get('equipment') || "40'HC";
 
   try {
-    const rates = await fetchAllCarrierRates(pol, pod, equipment);
+    const rates = calculateCarrierRates(pol, pod, equipment);
     return NextResponse.json({
       success: true,
       pol,
