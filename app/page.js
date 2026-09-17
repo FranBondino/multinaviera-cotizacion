@@ -56,14 +56,22 @@ export default function MulticotizadorHome() {
   const podObj = GLOBAL_PORTS.find(p => p.code === pod) || { name: pod, country: '' };
 
   const processedRates = ratesData.map(rate => {
-    const totalCost = rate.baseFreight + rate.thc + rate.baf;
-    const margin = usePct ? Math.round((totalCost * marginPct) / 100) : Number(marginUSD);
-    const clientPrice = totalCost + margin;
-    return { ...rate, totalCost, margin, clientPrice };
+    const hasLiveRate = typeof rate.baseFreight === 'number' && rate.baseFreight > 0 && rate.isRateVerified === true;
+    const totalCost = hasLiveRate ? (rate.baseFreight + (rate.thc || 0) + (rate.baf || 0)) : null;
+    const margin = hasLiveRate ? (usePct ? Math.round((totalCost * marginPct) / 100) : Number(marginUSD)) : Number(marginUSD);
+    const clientPrice = hasLiveRate ? (totalCost + margin) : null;
+    return { ...rate, hasLiveRate, totalCost, margin, clientPrice };
   });
 
+  const hasAnyLiveRate = processedRates.some(r => r.hasLiveRate);
+
   if (sortBy === 'price') {
-    processedRates.sort((a, b) => a.clientPrice - b.clientPrice);
+    processedRates.sort((a, b) => {
+      if (a.hasLiveRate && b.hasLiveRate) return a.clientPrice - b.clientPrice;
+      if (a.hasLiveRate) return -1;
+      if (b.hasLiveRate) return 1;
+      return a.transitDays - b.transitDays;
+    });
   } else if (sortBy === 'transit') {
     processedRates.sort((a, b) => a.transitDays - b.transitDays);
   } else if (sortBy === 'etd') {
@@ -115,7 +123,7 @@ export default function MulticotizadorHome() {
                 border: '1px solid rgba(6, 182, 212, 0.3)'
               }}>FREIGHT INTELLIGENCE</span>
             </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.2rem 0 0 0' }}>Cotizador & Tarifario Multinaviera en Tiempo Real</p>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.2rem 0 0 0' }}>Itinerarios Oficiales en Vivo & Gestión de Cotizaciones Navieras</p>
           </div>
         </div>
 
@@ -143,7 +151,7 @@ export default function MulticotizadorHome() {
       </header>
 
       {/* Interactive Flow Indicator Banner */}
-      <div className="glass-panel" style={{ padding: '1.75rem 2.25rem', marginBottom: '2rem', background: 'linear-gradient(135deg, rgba(13, 20, 36, 0.95), rgba(20, 30, 55, 0.6))', position: 'relative', overflow: 'hidden' }}>
+      <div className="glass-panel" style={{ padding: '1.75rem 2.25rem', marginBottom: '1.5rem', background: 'linear-gradient(135deg, rgba(13, 20, 36, 0.95), rgba(20, 30, 55, 0.6))', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '-50%', left: '-10%', width: '300px', height: '300px', background: 'var(--primary-glow)', filter: 'blur(80px)', borderRadius: '50%', zIndex: 0, pointerEvents: 'none' }}></div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem', position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
@@ -179,7 +187,33 @@ export default function MulticotizadorHome() {
               gap: '0.4rem',
               border: '1px solid rgba(255,255,255,0.08)'
             }}>
-              {isUpdating ? '⚡ Actualizando...' : '⚡ Cotización Instantánea'}
+              {isUpdating ? '⚡ Consultando APIs...' : '⚡ Itinerarios en Vivo'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Data Integrity & Policy Banner */}
+      <div style={{
+        background: 'rgba(234, 179, 8, 0.07)',
+        border: '1px solid rgba(234, 179, 8, 0.25)',
+        borderRadius: '12px',
+        padding: '0.9rem 1.25rem',
+        marginBottom: '2rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '1rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{ fontSize: '1.25rem' }}>🛡️</span>
+          <div>
+            <span style={{ fontSize: '0.85rem', color: '#fef08a', fontWeight: '700' }}>
+              Política de Integridad Total de Datos:
+            </span>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginLeft: '0.4rem' }}>
+              Los itinerarios, buques, viajes y cut-offs son 100% reales desde las APIs oficiales (ONE, MSC, Maersk). No se muestran tarifas estimadas ni simuladas. Las cotizaciones de flete se confirman exclusivamente contra reserva de espacio / tarifas spot oficiales.
             </span>
           </div>
         </div>
@@ -253,16 +287,18 @@ export default function MulticotizadorHome() {
         {/* Sorting controls */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '1rem' }}>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Comparativa en vivo de <strong style={{ color: 'white' }}>5 Navieras Líderes</strong>
+            Itinerarios de buques en vivo de <strong style={{ color: 'white' }}>5 Navieras Líderes</strong>
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Ordenar por:</span>
-            <button
-              onClick={() => setSortBy('price')}
-              className={`btn-secondary ${sortBy === 'price' ? 'active' : ''}`}
-            >
-              💵 Menor Precio Total
-            </button>
+            {hasAnyLiveRate && (
+              <button
+                onClick={() => setSortBy('price')}
+                className={`btn-secondary ${sortBy === 'price' ? 'active' : ''}`}
+              >
+                💵 Menor Precio
+              </button>
+            )}
             <button
               onClick={() => setSortBy('transit')}
               className={`btn-secondary ${sortBy === 'transit' ? 'active' : ''}`}
@@ -313,7 +349,7 @@ export default function MulticotizadorHome() {
                 letterSpacing: '0.5px',
                 boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)'
               }}>
-                ⭐ MEJOR OPCIÓN ({sortBy === 'price' ? 'PRECIO' : sortBy === 'transit' ? 'TRÁNSITO' : 'SALIDA'})
+                ⭐ {sortBy === 'transit' ? 'TRÁNSITO MÁS RÁPIDO' : sortBy === 'etd' ? 'SALIDA MÁS PRÓXIMA' : (hasAnyLiveRate ? 'MEJOR PRECIO' : 'PRIMERA OPCIÓN OPERATIVA')}
               </span>
             )}
 
@@ -402,24 +438,47 @@ export default function MulticotizadorHome() {
               </div>
 
               {/* Cost Itemization */}
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                  <span>Flete Base Ocean Freight:</span>
-                  <span style={{ color: 'white', fontWeight: '600' }}>USD {rate.baseFreight}</span>
+              {rate.hasLiveRate ? (
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <span>Flete Base Ocean Freight:</span>
+                    <span style={{ color: 'white', fontWeight: '600' }}>USD {rate.baseFreight}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <span>THC (Terminal Handling):</span>
+                    <span style={{ color: 'white', fontWeight: '600' }}>USD {rate.thc || 0}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <span>BAF Fuel Surcharge:</span>
+                    <span style={{ color: 'white', fontWeight: '600' }}>USD {rate.baf || 0}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '1px dashed var(--border-subtle)', fontWeight: '700', color: 'var(--text-main)' }}>
+                    <span>Costo Neto Almar:</span>
+                    <span style={{ color: 'var(--accent-cyan)' }}>USD {rate.totalCost}</span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                  <span>THC (Terminal Handling):</span>
-                  <span style={{ color: 'white', fontWeight: '600' }}>USD {rate.thc}</span>
+              ) : (
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px dashed rgba(255, 255, 255, 0.1)',
+                  borderRadius: '10px',
+                  padding: '0.85rem 1rem',
+                  marginBottom: '1.25rem',
+                  fontSize: '0.82rem'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <span style={{ color: '#eab308', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <span>🔒</span> Tarifa Spot / Convenio
+                    </span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '0.1rem 0.45rem', borderRadius: '4px' }}>
+                      Mesa Comercial
+                    </span>
+                  </div>
+                  <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.78rem', lineHeight: '1.45' }}>
+                    Tarifa flete sujeta a disponibilidad de espacio y validez spot. No mostramos datos ficticios.
+                  </p>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                  <span>BAF Fuel Surcharge:</span>
-                  <span style={{ color: 'white', fontWeight: '600' }}>USD {rate.baf}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '1px dashed var(--border-subtle)', fontWeight: '700', color: 'var(--text-main)' }}>
-                  <span>Costo Neto Almar:</span>
-                  <span style={{ color: 'var(--accent-cyan)' }}>USD {rate.totalCost}</span>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Pricing & Call-to-action */}
@@ -429,16 +488,30 @@ export default function MulticotizadorHome() {
               marginTop: '0.5rem'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.6rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Precio Cliente:</span>
-                <span style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--success)', letterSpacing: '-0.5px' }}>
-                  USD {rate.clientPrice}
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                  {rate.hasLiveRate ? 'Precio Cliente:' : 'Tarifa Flete Cliente:'}
                 </span>
+                {rate.hasLiveRate ? (
+                  <span style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--success)', letterSpacing: '-0.5px' }}>
+                    USD {rate.clientPrice}
+                  </span>
+                ) : (
+                  <span style={{ fontSize: '1.15rem', fontWeight: '800', color: '#eab308', letterSpacing: '-0.3px' }}>
+                    A Cotizar s/ Espacio
+                  </span>
+                )}
               </div>
 
               <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ background: 'rgba(6, 182, 212, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: '700' }}>
-                  Ganancia Almar: +USD {rate.margin}
-                </span>
+                {rate.hasLiveRate ? (
+                  <span style={{ background: 'rgba(6, 182, 212, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: '700' }}>
+                    Ganancia Almar: +USD {rate.margin}
+                  </span>
+                ) : (
+                  <span style={{ background: 'rgba(234, 179, 8, 0.12)', color: '#facc15', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: '700' }}>
+                    Margen Almar: +{usePct ? `${marginPct}%` : `USD ${marginUSD}`}
+                  </span>
+                )}
                 <span style={{ color: 'var(--text-dim)', fontSize: '0.72rem' }}>
                   {rate.apiSource ? rate.apiSource.split('(')[0] : rate.status}
                 </span>
@@ -449,7 +522,7 @@ export default function MulticotizadorHome() {
                 className="btn-primary"
                 style={{ width: '100%', padding: '0.85rem', fontSize: '0.9rem', fontWeight: '700' }}
               >
-                📄 Generar Cotización Cliente
+                {rate.hasLiveRate ? '📄 Generar Cotización Cliente' : '📄 Solicitar / Consultar Itinerario'}
               </button>
             </div>
           </div>
@@ -545,30 +618,51 @@ export default function MulticotizadorHome() {
                 <p>🏢 <strong>Código Cliente Naviera:</strong> {selectedQuoteModal.partyId}</p>
               )}
               <hr style={{ border: 'none', borderTop: '1px dashed var(--border-subtle)', margin: '1rem 0' }} />
-              <p style={{ fontSize: '1.35rem', fontWeight: '800', color: 'var(--success)', margin: '0.5rem 0' }}>
-                💵 TARIFA CLIENTE: USD {selectedQuoteModal.clientPrice} / Contenedor
-              </p>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                * Incluye Flete Marítimo + THC + BAF. Oferta confirmada con disponibilidad de espacio.
-              </p>
+              {selectedQuoteModal.hasLiveRate ? (
+                <>
+                  <p style={{ fontSize: '1.35rem', fontWeight: '800', color: 'var(--success)', margin: '0.5rem 0' }}>
+                    💵 TARIFA CLIENTE: USD {selectedQuoteModal.clientPrice} / Contenedor
+                  </p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                    * Incluye Flete Marítimo + THC + BAF. Oferta confirmada con disponibilidad de espacio.
+                  </p>
+                </>
+              ) : (
+                <div style={{
+                  background: 'rgba(234, 179, 8, 0.08)',
+                  border: '1px solid rgba(234, 179, 8, 0.25)',
+                  borderRadius: '10px',
+                  padding: '0.85rem 1rem',
+                  margin: '0.5rem 0'
+                }}>
+                  <p style={{ fontSize: '1.15rem', fontWeight: '800', color: '#facc15', margin: 0 }}>
+                    💵 TARIFA: A Cotizar en Mesa Comercial
+                  </p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.35rem 0 0 0' }}>
+                    Margen agencia configurado: +{usePct ? `${marginPct}%` : `USD ${marginUSD}`}. Tarifa y espacio sujetos a confirmación spot oficial al momento del booking.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
               <button
-                onClick={() => copyToClipboard(`🚢 *ALMAR ROSARIO - COTIZACIÓN DE FLETE MARÍTIMO*
-${selectedQuoteModal.badge ? `[${selectedQuoteModal.badge}] • ${selectedQuoteModal.apiSource || 'Tarifario Oficial'}\n` : ''}
+                onClick={() => copyToClipboard(`🚢 *ALMAR ROSARIO - PROPUESTA OPERATIVA DE EMBARQUE*
+${selectedQuoteModal.badge ? `[${selectedQuoteModal.badge}] • ${selectedQuoteModal.apiSource || 'Itinerario Oficial'}\n` : ''}
 📍 *Origen (POL):* ${polObj.name} (${polObj.country})
 🏁 *Destino (POD):* ${podObj.name} (${podObj.country})
 📦 *Equipo:* ${equipment}
 🚢 *Naviera:* ${selectedQuoteModal.carrier} (${selectedQuoteModal.serviceName})
-🛳️ *Buque:* ${selectedQuoteModal.vessel}
+🛳️ *Buque / Viaje:* ${selectedQuoteModal.vessel}
 ⚡ *Tiempo Tránsito:* ${selectedQuoteModal.transitDays} días directos
 📅 *ETD Salida:* ${selectedQuoteModal.etd}
 🏁 *ETA Llegada:* ${selectedQuoteModal.eta}
 ${selectedQuoteModal.cutoffs ? `⏰ *Cut-offs:* Carga: ${selectedQuoteModal.cutoffs.cargoCutoff || selectedQuoteModal.cutoffs.cyCutoff || '-'} | VGM: ${selectedQuoteModal.cutoffs.vgmCutoff || '-'}\n` : ''}
-💵 *TARIFA FINAL CLIENTE:* USD ${selectedQuoteModal.clientPrice} / Contenedor
+${selectedQuoteModal.hasLiveRate 
+  ? `💵 *TARIFA FINAL CLIENTE:* USD ${selectedQuoteModal.clientPrice} / Contenedor\n_Incluye Flete Marítimo + THC + BAF._` 
+  : `💵 *TARIFA:* A cotizar según espacio disponible / spot al momento del booking.\n_Margen agencia: +${usePct ? `${marginPct}%` : `USD ${marginUSD}`}_`}
 
-_Incluye Flete Marítimo + THC + BAF. Operado por Almar Rosario SRL._`)}
+_Operado por Almar Rosario SRL - Freight Intelligence._`)}
                 className="btn-primary"
                 style={{ flex: 1, padding: '0.85rem', fontSize: '0.9rem', fontWeight: '700' }}
               >
