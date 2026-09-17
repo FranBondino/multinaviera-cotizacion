@@ -5,6 +5,7 @@ import { fetchMscLiveSchedule } from '../../../lib/carriers/msc';
 import { fetchMaerskLiveSchedule } from '../../../lib/carriers/maersk';
 import { fetchHapagLiveSchedule } from '../../../lib/carriers/hapag';
 import { fetchOneLiveSchedule } from '../../../lib/carriers/one';
+import { getMaerskCommercialSpotRate, getMaerskBrokerStatus } from '../../../lib/carriers/maerskCommercialBroker';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,18 +28,20 @@ export async function GET(request) {
     if (podUnlocode === 'BUE') podUnlocode = 'ARBUE';
     if (podUnlocode === 'ROS') podUnlocode = 'ARROS';
 
-    // 3. Fetch Live MSC, Maersk, Hapag-Lloyd, and ONE in parallel with safeguard
-    const [mscLiveResult, maerskLiveResult, hapagLiveResult, oneLiveResult] = await Promise.allSettled([
+    // 3. Fetch Live MSC, Maersk, Hapag-Lloyd, ONE and Maersk Spot in parallel with safeguard
+    const [mscLiveResult, maerskLiveResult, hapagLiveResult, oneLiveResult, maerskSpotResult] = await Promise.allSettled([
       fetchMscLiveSchedule(polUnlocode, podUnlocode),
       fetchMaerskLiveSchedule(polUnlocode, podUnlocode),
       fetchHapagLiveSchedule(polUnlocode, podUnlocode),
-      fetchOneLiveSchedule(polUnlocode, podUnlocode)
+      fetchOneLiveSchedule(polUnlocode, podUnlocode),
+      getMaerskCommercialSpotRate(polUnlocode, podUnlocode, equipment)
     ]);
 
     const mscRoutes = mscLiveResult.status === 'fulfilled' ? mscLiveResult.value : null;
     const maerskRoutes = maerskLiveResult.status === 'fulfilled' ? maerskLiveResult.value : null;
     const hapagRoutes = hapagLiveResult.status === 'fulfilled' ? hapagLiveResult.value : null;
     const oneRoutes = oneLiveResult.status === 'fulfilled' ? oneLiveResult.value : null;
+    const maerskSpot = maerskSpotResult.status === 'fulfilled' ? maerskSpotResult.value : null;
 
     // 4. Merge live carrier feeds into final rate cards
     const enhancedRates = baseRates.map(rate => {
@@ -70,10 +73,36 @@ export async function GET(request) {
         };
       }
 
-      // --- MAERSK APPROVED DCSA INTEGRATION ---
+      // --- MAERSK APPROVED DCSA & COMMERCIAL GATEWAY ---
       if (rate.carrier === 'Maersk') {
         const isDirectLive = maerskRoutes && maerskRoutes.length > 0;
         const best = isDirectLive ? maerskRoutes[0] : null;
+
+        // If verified commercial spot rate is active from broker
+        if (maerskSpot && maerskSpot.available && typeof maerskSpot.baseFreight === 'number') {
+          return {
+            ...rate,
+            vessel: best?.vessel || 'MAERSK MC-KINNEY MOLLER / 2608E',
+            serviceName: best?.serviceName || 'AE1 / FE4 Express (DCSA)',
+            transitDays: best?.transitDays || rate.transitDays || 24,
+            etd: best?.etd || rate.etd,
+            eta: best?.eta || rate.eta,
+            baseFreight: maerskSpot.baseFreight,
+            thc: maerskSpot.thc || 0,
+            baf: maerskSpot.baf || 0,
+            isRateVerified: true,
+            isLive: true,
+            isDCSAApproved: true,
+            badge: '🟢 SPOT EN VIVO (MAERSK)',
+            badgeColor: '#06b6d4',
+            apiSource: 'Maersk Spot Commercial Portal (almarrosario)',
+            partyId: '30000026972 (Almar Rosario SRL)',
+            quoteReference: maerskSpot.quoteReference || null,
+            fromCache: maerskSpot.fromCache || false
+          };
+        }
+
+        // Standard DCSA live schedule with commercial gateway standby
         return {
           ...rate,
           vessel: best?.vessel || 'MAERSK MC-KINNEY MOLLER / 2608E',
@@ -86,7 +115,8 @@ export async function GET(request) {
           badge: isDirectLive ? '🟢 DCSA EN VIVO' : '🟢 DCSA APROBADA',
           badgeColor: '#06b6d4',
           apiSource: 'API Oficial Maersk DCSA (Aprobada Developer Portal)',
-          partyId: '30000026972 (Almar Rosario SRL)'
+          partyId: '30000026972 (Almar Rosario SRL)',
+          commercialBrokerStatus: maerskSpot?.reason || 'PROTECTED_STANDBY'
         };
       }
 
@@ -145,6 +175,9 @@ export async function GET(request) {
         one: !!(oneRoutes && oneRoutes.length > 0),
         maersk: 'approved_dcsa',
         hapag: !!(hapagRoutes && hapagRoutes.length > 0)
+      },
+      commercialBrokers: {
+        maersk: getMaerskBrokerStatus()
       },
       rates: enhancedRates
     });
