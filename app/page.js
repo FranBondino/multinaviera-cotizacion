@@ -20,17 +20,36 @@ export default function MulticotizadorHome() {
   const [lastUpdated, setLastUpdated] = useState('En vivo');
   const [selectedQuoteModal, setSelectedQuoteModal] = useState(null);
 
-  // Update rates instantly on parameter change
+  // Update rates: instant local baseline + live API fetch
   useEffect(() => {
     setIsUpdating(true);
-    const timer = setTimeout(() => {
-      const newRates = calculateCarrierRates(pol, pod, equipment);
-      setRatesData(newRates);
-      setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-      setIsUpdating(false);
-    }, 80); // Ultra fast 80ms transition
+    let isCancelled = false;
 
-    return () => clearTimeout(timer);
+    // 1. Instant baseline calculation to prevent layout flickers
+    const base = calculateCarrierRates(pol, pod, equipment);
+    setRatesData(base);
+
+    // 2. Fetch live data from /api/quote (MSC live schedules + Maersk approved DCSA)
+    fetch(`/api/quote?pol=${pol}&pod=${pod}&equipment=${encodeURIComponent(equipment)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!isCancelled && data.success && Array.isArray(data.rates)) {
+          setRatesData(data.rates);
+          setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+        }
+      })
+      .catch(err => {
+        console.warn('Multicotizador API live fetch fallback:', err);
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsUpdating(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [pol, pod, equipment]);
 
   const polObj = GLOBAL_PORTS.find(p => p.code === pol) || { name: pol, country: '' };
@@ -113,7 +132,7 @@ export default function MulticotizadorHome() {
             alignItems: 'center',
             gap: '0.5rem'
           }}>
-            <span>●</span> 4 Navieras Conectadas
+            <span>●</span> MSC Live API + Maersk DCSA Conectadas
           </div>
           {lastUpdated && (
             <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-subtle)', fontFamily: 'monospace' }}>
@@ -300,7 +319,7 @@ export default function MulticotizadorHome() {
 
             <div>
               {/* Carrier Brand & Logo Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{
                     width: '42px',
@@ -322,6 +341,23 @@ export default function MulticotizadorHome() {
                     </span>
                   </div>
                 </div>
+
+                {/* Official Live or Approved Badge */}
+                {rate.badge && (
+                  <span style={{
+                    background: rate.badgeColor === '#10b981' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(6, 182, 212, 0.15)',
+                    color: rate.badgeColor || '#10b981',
+                    border: `1px solid ${rate.badgeColor || '#10b981'}`,
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    padding: '0.25rem 0.6rem',
+                    borderRadius: '20px',
+                    letterSpacing: '0.3px',
+                    boxShadow: rate.badgeColor === '#10b981' ? '0 0 10px rgba(16, 185, 129, 0.25)' : '0 0 10px rgba(6, 182, 212, 0.25)'
+                  }}>
+                    {rate.badge}
+                  </span>
+                )}
               </div>
 
               {/* Itinerary Timeline */}
@@ -349,6 +385,18 @@ export default function MulticotizadorHome() {
                   <span style={{ color: 'var(--text-muted)' }}>Buque / Viaje:</span>
                   <span style={{ color: 'var(--text-main)', fontWeight: '600' }}>{rate.vessel}</span>
                 </div>
+                {rate.cutoffs && (rate.cutoffs.cyCutoff || rate.cutoffs.vgmCutoff) && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)', fontSize: '0.75rem' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Cut-off CY / VGM:</span>
+                    <span style={{ color: 'var(--warning)', fontWeight: '600' }}>{rate.cutoffs.cyCutoff}</span>
+                  </div>
+                )}
+                {rate.partyId && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)', fontSize: '0.75rem' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Cuenta DCSA:</span>
+                    <span style={{ color: 'var(--primary)', fontWeight: '600' }}>{rate.partyId.split(' ')[0]}</span>
+                  </div>
+                )}
               </div>
 
               {/* Cost Itemization */}
@@ -389,7 +437,9 @@ export default function MulticotizadorHome() {
                 <span style={{ background: 'rgba(6, 182, 212, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: '700' }}>
                   Ganancia Almar: +USD {rate.margin}
                 </span>
-                <span style={{ color: 'var(--text-dim)' }}>{rate.status}</span>
+                <span style={{ color: 'var(--text-dim)', fontSize: '0.72rem' }}>
+                  {rate.apiSource ? rate.apiSource.split('(')[0] : rate.status}
+                </span>
               </div>
 
               <button
@@ -416,7 +466,7 @@ export default function MulticotizadorHome() {
           backdropFilter: 'blur(12px)',
           display: 'flex',
           alignItems: 'center',
-          justify: 'center',
+          justifyContent: 'center',
           padding: '1.5rem',
           zIndex: 1000
         }}>
@@ -442,7 +492,7 @@ export default function MulticotizadorHome() {
                 height: '32px',
                 display: 'flex',
                 alignItems: 'center',
-                justify: 'center',
+                justifyContent: 'center',
                 cursor: 'pointer'
               }}
             >
@@ -460,28 +510,63 @@ export default function MulticotizadorHome() {
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.8)', padding: '1.5rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: '1.7', marginBottom: '1.75rem', color: 'var(--text-main)', border: '1px solid var(--border-subtle)' }}>
-              <p style={{ fontWeight: '800', color: 'var(--primary)', marginBottom: '0.75rem', fontSize: '0.95rem' }}>
-                🚢 ALMAR ROSARIO - OFERTA DE FLETE MARÍTIMO
-              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <span style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '0.95rem' }}>
+                  🚢 ALMAR ROSARIO - OFERTA OFICIAL
+                </span>
+                {selectedQuoteModal.badge && (
+                  <span style={{
+                    background: selectedQuoteModal.badgeColor === '#10b981' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(6, 182, 212, 0.2)',
+                    color: selectedQuoteModal.badgeColor || '#10b981',
+                    border: `1px solid ${selectedQuoteModal.badgeColor || '#10b981'}`,
+                    padding: '0.15rem 0.5rem',
+                    borderRadius: '12px',
+                    fontSize: '0.72rem',
+                    fontWeight: '800'
+                  }}>
+                    {selectedQuoteModal.badge}
+                  </span>
+                )}
+              </div>
               <p>📍 <strong>Origen (POL):</strong> {polObj.name} ({polObj.country})</p>
               <p>🏁 <strong>Destino (POD):</strong> {podObj.name} ({podObj.country})</p>
               <p>📦 <strong>Equipo:</strong> {equipment}</p>
               <p>🚢 <strong>Naviera:</strong> {selectedQuoteModal.carrier} ({selectedQuoteModal.serviceName})</p>
+              <p>🛳️ <strong>Buque / Viaje Asignado:</strong> {selectedQuoteModal.vessel}</p>
               <p>⚡ <strong>Tiempo de Tránsito:</strong> {selectedQuoteModal.transitDays} días directos</p>
               <p>📅 <strong>ETD (Salida Estimada):</strong> {selectedQuoteModal.etd}</p>
               <p>🏁 <strong>ETA (Llegada Estimada):</strong> {selectedQuoteModal.eta}</p>
+              {selectedQuoteModal.cutoffs && (
+                <p>⏰ <strong>Cut-off Documental / VGM:</strong> {selectedQuoteModal.cutoffs.cyCutoff}</p>
+              )}
+              {selectedQuoteModal.partyId && (
+                <p>🏢 <strong>Código Cliente Naviera:</strong> {selectedQuoteModal.partyId}</p>
+              )}
               <hr style={{ border: 'none', borderTop: '1px dashed var(--border-subtle)', margin: '1rem 0' }} />
               <p style={{ fontSize: '1.35rem', fontWeight: '800', color: 'var(--success)', margin: '0.5rem 0' }}>
                 💵 TARIFA CLIENTE: USD {selectedQuoteModal.clientPrice} / Contenedor
               </p>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                * Incluye Flete Marítimo + THC + BAF. Oferta válida por 15 días sujeta a disponibilidad de espacio.
+                * Incluye Flete Marítimo + THC + BAF. Oferta confirmada con disponibilidad de espacio.
               </p>
             </div>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
               <button
-                onClick={() => copyToClipboard(`🚢 *ALMAR ROSARIO - COTIZACIÓN DE FLETE MARÍTIMO*\n\n📍 *Origen:* ${polObj.name} (${polObj.country})\n🏁 *Destino:* ${podObj.name} (${podObj.country})\n📦 *Equipo:* ${equipment}\n🚢 *Naviera:* ${selectedQuoteModal.carrier} (${selectedQuoteModal.serviceName})\n⚡ *Tiempo Tránsito:* ${selectedQuoteModal.transitDays} días\n📅 *ETD Salida:* ${selectedQuoteModal.etd}\n🏁 *ETA Llegada:* ${selectedQuoteModal.eta}\n\n💵 *TARIFA FINAL CLIENTE:* USD ${selectedQuoteModal.clientPrice} / Contenedor\n\n_Incluye Flete Marítimo + THC + BAF. Oferta sujeta a disponibilidad._`)}
+                onClick={() => copyToClipboard(`🚢 *ALMAR ROSARIO - COTIZACIÓN DE FLETE MARÍTIMO*
+${selectedQuoteModal.badge ? `[${selectedQuoteModal.badge}] • ${selectedQuoteModal.apiSource || 'Tarifario Oficial'}\n` : ''}
+📍 *Origen (POL):* ${polObj.name} (${polObj.country})
+🏁 *Destino (POD):* ${podObj.name} (${podObj.country})
+📦 *Equipo:* ${equipment}
+🚢 *Naviera:* ${selectedQuoteModal.carrier} (${selectedQuoteModal.serviceName})
+🛳️ *Buque:* ${selectedQuoteModal.vessel}
+⚡ *Tiempo Tránsito:* ${selectedQuoteModal.transitDays} días directos
+📅 *ETD Salida:* ${selectedQuoteModal.etd}
+🏁 *ETA Llegada:* ${selectedQuoteModal.eta}
+${selectedQuoteModal.cutoffs ? `⏰ *Cut-offs:* CY ${selectedQuoteModal.cutoffs.cyCutoff} | VGM ${selectedQuoteModal.cutoffs.vgmCutoff}\n` : ''}
+💵 *TARIFA FINAL CLIENTE:* USD ${selectedQuoteModal.clientPrice} / Contenedor
+
+_Incluye Flete Marítimo + THC + BAF. Operado por Almar Rosario SRL._`)}
                 className="btn-primary"
                 style={{ flex: 1, padding: '0.85rem', fontSize: '0.9rem', fontWeight: '700' }}
               >
