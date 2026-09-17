@@ -210,10 +210,10 @@ export default function MulticotizadorHome() {
           <span style={{ fontSize: '1.25rem' }}>🛡️</span>
           <div>
             <span style={{ fontSize: '0.85rem', color: '#fef08a', fontWeight: '700' }}>
-              Política de Integridad Total de Datos:
+              Integridad Total de Datos en Vivo:
             </span>
             <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginLeft: '0.4rem' }}>
-              Los itinerarios, buques, viajes y cut-offs son 100% reales desde las APIs oficiales (ONE, MSC, Maersk). No se muestran tarifas estimadas ni simuladas. Las cotizaciones de flete se confirman exclusivamente contra reserva de espacio / tarifas spot oficiales.
+              Los itinerarios, buques, viajes y cut-offs son 100% reales obtenidos en tiempo real desde las APIs oficiales de ONE y MSC. Cero datos simulados.
             </span>
           </div>
         </div>
@@ -287,7 +287,7 @@ export default function MulticotizadorHome() {
         {/* Sorting controls */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '1rem' }}>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Itinerarios de buques en vivo de <strong style={{ color: 'white' }}>5 Navieras Líderes</strong>
+            Itinerarios de buques en tiempo real de <strong style={{ color: 'white' }}>Navieras Conectadas (MSC & ONE)</strong>
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Ordenar por:</span>
