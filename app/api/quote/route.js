@@ -80,8 +80,7 @@ export async function GET(request) {
           badge: isDirectLive ? '🟢 DCSA EN VIVO' : '🟢 DCSA APROBADA',
           badgeColor: '#06b6d4',
           apiSource: 'API Oficial Maersk DCSA (Aprobada Developer Portal)',
-          partyId: '30000026972 (Almar Rosario SRL)',
-          integrationId: '1e670145-296c-4473-85ea-a4071e185aa1'
+          partyId: '30000026972 (Almar Rosario SRL)'
         };
       }
 
