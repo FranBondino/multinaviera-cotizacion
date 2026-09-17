@@ -132,7 +132,7 @@ export default function MulticotizadorHome() {
             alignItems: 'center',
             gap: '0.5rem'
           }}>
-            <span>●</span> MSC Live API + Maersk DCSA Conectadas
+            <span>●</span> MSC + Maersk + ONE APIs Conectadas
           </div>
           {lastUpdated && (
             <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-subtle)', fontFamily: 'monospace' }}>
@@ -253,7 +253,7 @@ export default function MulticotizadorHome() {
         {/* Sorting controls */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '1rem' }}>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Comparativa en vivo de <strong style={{ color: 'white' }}>4 Navieras Líderes</strong>
+            Comparativa en vivo de <strong style={{ color: 'white' }}>5 Navieras Líderes</strong>
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Ordenar por:</span>
@@ -345,7 +345,7 @@ export default function MulticotizadorHome() {
                 {/* Official Live or Approved Badge */}
                 {rate.badge && (
                   <span style={{
-                    background: rate.badgeColor === '#10b981' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(6, 182, 212, 0.15)',
+                    background: rate.badgeColor ? `${rate.badgeColor}22` : 'rgba(16, 185, 129, 0.15)',
                     color: rate.badgeColor || '#10b981',
                     border: `1px solid ${rate.badgeColor || '#10b981'}`,
                     fontSize: '0.72rem',
@@ -353,7 +353,7 @@ export default function MulticotizadorHome() {
                     padding: '0.25rem 0.6rem',
                     borderRadius: '20px',
                     letterSpacing: '0.3px',
-                    boxShadow: rate.badgeColor === '#10b981' ? '0 0 10px rgba(16, 185, 129, 0.25)' : '0 0 10px rgba(6, 182, 212, 0.25)'
+                    boxShadow: rate.badgeColor ? `0 0 10px ${rate.badgeColor}33` : '0 0 10px rgba(16, 185, 129, 0.25)'
                   }}>
                     {rate.badge}
                   </span>
@@ -385,10 +385,12 @@ export default function MulticotizadorHome() {
                   <span style={{ color: 'var(--text-muted)' }}>Buque / Viaje:</span>
                   <span style={{ color: 'var(--text-main)', fontWeight: '600' }}>{rate.vessel}</span>
                 </div>
-                {rate.cutoffs && (rate.cutoffs.cyCutoff || rate.cutoffs.vgmCutoff) && (
+                {rate.cutoffs && (rate.cutoffs.cyCutoff || rate.cutoffs.vgmCutoff || rate.cutoffs.cargoCutoff) && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)', fontSize: '0.75rem' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Cut-off CY / VGM:</span>
-                    <span style={{ color: 'var(--warning)', fontWeight: '600' }}>{rate.cutoffs.cyCutoff}</span>
+                    <span style={{ color: 'var(--text-muted)' }}>Cut-off Carga / VGM:</span>
+                    <span style={{ color: 'var(--warning)', fontWeight: '600' }}>
+                      {rate.cutoffs.cargoCutoff || rate.cutoffs.cyCutoff || rate.cutoffs.vgmCutoff}
+                    </span>
                   </div>
                 )}
                 {rate.partyId && (
@@ -516,7 +518,7 @@ export default function MulticotizadorHome() {
                 </span>
                 {selectedQuoteModal.badge && (
                   <span style={{
-                    background: selectedQuoteModal.badgeColor === '#10b981' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(6, 182, 212, 0.2)',
+                    background: selectedQuoteModal.badgeColor ? `${selectedQuoteModal.badgeColor}26` : 'rgba(16, 185, 129, 0.2)',
                     color: selectedQuoteModal.badgeColor || '#10b981',
                     border: `1px solid ${selectedQuoteModal.badgeColor || '#10b981'}`,
                     padding: '0.15rem 0.5rem',
@@ -537,7 +539,7 @@ export default function MulticotizadorHome() {
               <p>📅 <strong>ETD (Salida Estimada):</strong> {selectedQuoteModal.etd}</p>
               <p>🏁 <strong>ETA (Llegada Estimada):</strong> {selectedQuoteModal.eta}</p>
               {selectedQuoteModal.cutoffs && (
-                <p>⏰ <strong>Cut-off Documental / VGM:</strong> {selectedQuoteModal.cutoffs.cyCutoff}</p>
+                <p>⏰ <strong>Cut-off Carga / VGM:</strong> {selectedQuoteModal.cutoffs.cargoCutoff || selectedQuoteModal.cutoffs.cyCutoff || selectedQuoteModal.cutoffs.vgmCutoff}</p>
               )}
               {selectedQuoteModal.partyId && (
                 <p>🏢 <strong>Código Cliente Naviera:</strong> {selectedQuoteModal.partyId}</p>
@@ -563,7 +565,7 @@ ${selectedQuoteModal.badge ? `[${selectedQuoteModal.badge}] • ${selectedQuoteM
 ⚡ *Tiempo Tránsito:* ${selectedQuoteModal.transitDays} días directos
 📅 *ETD Salida:* ${selectedQuoteModal.etd}
 🏁 *ETA Llegada:* ${selectedQuoteModal.eta}
-${selectedQuoteModal.cutoffs ? `⏰ *Cut-offs:* CY ${selectedQuoteModal.cutoffs.cyCutoff} | VGM ${selectedQuoteModal.cutoffs.vgmCutoff}\n` : ''}
+${selectedQuoteModal.cutoffs ? `⏰ *Cut-offs:* Carga: ${selectedQuoteModal.cutoffs.cargoCutoff || selectedQuoteModal.cutoffs.cyCutoff || '-'} | VGM: ${selectedQuoteModal.cutoffs.vgmCutoff || '-'}\n` : ''}
 💵 *TARIFA FINAL CLIENTE:* USD ${selectedQuoteModal.clientPrice} / Contenedor
 
 _Incluye Flete Marítimo + THC + BAF. Operado por Almar Rosario SRL._`)}

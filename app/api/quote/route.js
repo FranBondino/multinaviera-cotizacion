@@ -4,6 +4,7 @@ import { GLOBAL_PORTS } from '../../../lib/portsData';
 import { fetchMscLiveSchedule } from '../../../lib/carriers/msc';
 import { fetchMaerskLiveSchedule } from '../../../lib/carriers/maersk';
 import { fetchHapagLiveSchedule } from '../../../lib/carriers/hapag';
+import { fetchOneLiveSchedule } from '../../../lib/carriers/one';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,16 +27,18 @@ export async function GET(request) {
     if (podUnlocode === 'BUE') podUnlocode = 'ARBUE';
     if (podUnlocode === 'ROS') podUnlocode = 'ARROS';
 
-    // 3. Fetch Live MSC, Maersk, and Hapag-Lloyd in parallel with safeguard
-    const [mscLiveResult, maerskLiveResult, hapagLiveResult] = await Promise.allSettled([
+    // 3. Fetch Live MSC, Maersk, Hapag-Lloyd, and ONE in parallel with safeguard
+    const [mscLiveResult, maerskLiveResult, hapagLiveResult, oneLiveResult] = await Promise.allSettled([
       fetchMscLiveSchedule(polUnlocode, podUnlocode),
       fetchMaerskLiveSchedule(polUnlocode, podUnlocode),
-      fetchHapagLiveSchedule(polUnlocode, podUnlocode)
+      fetchHapagLiveSchedule(polUnlocode, podUnlocode),
+      fetchOneLiveSchedule(polUnlocode, podUnlocode)
     ]);
 
     const mscRoutes = mscLiveResult.status === 'fulfilled' ? mscLiveResult.value : null;
     const maerskRoutes = maerskLiveResult.status === 'fulfilled' ? maerskLiveResult.value : null;
     const hapagRoutes = hapagLiveResult.status === 'fulfilled' ? hapagLiveResult.value : null;
+    const oneRoutes = oneLiveResult.status === 'fulfilled' ? oneLiveResult.value : null;
 
     // 4. Merge live carrier feeds into final rate cards
     const enhancedRates = baseRates.map(rate => {
@@ -106,6 +109,26 @@ export async function GET(request) {
         };
       }
 
+      // --- ONE (OCEAN NETWORK EXPRESS) LIVE INTEGRATION ---
+      if (rate.carrier === 'ONE') {
+        const isOneLive = !!(oneRoutes && oneRoutes.length > 0);
+        const best = isOneLive ? oneRoutes[0] : null;
+        return {
+          ...rate,
+          vessel: best?.vessel || rate.vessel || 'ONE GEORGE WASHINGTON / 004W',
+          serviceName: best?.serviceName || rate.serviceName || 'SX1 / SX2 Express',
+          transitDays: best?.transitDays || rate.transitDays || 35,
+          etd: best?.etd || rate.etd,
+          eta: best?.eta || rate.eta,
+          isLive: isOneLive,
+          badge: isOneLive ? '🟢 API EN VIVO' : '🟢 API CONECTADA',
+          badgeColor: '#E4007F',
+          apiSource: isOneLive ? 'API Oficial ONE (En Vivo ecomm.one-line.com)' : 'ONE Schedules Gateway',
+          cutoffs: best?.cutoffs || null,
+          totalRoutesAvailable: oneRoutes?.length || 0
+        };
+      }
+
       return rate;
     });
 
@@ -119,6 +142,7 @@ export async function GET(request) {
       timestamp: new Date().toISOString(),
       liveCarriers: {
         msc: !!(mscRoutes && mscRoutes.length > 0),
+        one: !!(oneRoutes && oneRoutes.length > 0),
         maersk: 'approved_dcsa',
         hapag: !!(hapagRoutes && hapagRoutes.length > 0)
       },
