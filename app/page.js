@@ -19,6 +19,7 @@ export default function MulticotizadorHome() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [lastUpdated, setLastUpdated] = useState('En vivo');
   const [selectedQuoteModal, setSelectedQuoteModal] = useState(null);
+  const [selectedBookingModal, setSelectedBookingModal] = useState(null);
 
   // Update rates: instant local baseline + live API fetch
   useEffect(() => {
@@ -140,7 +141,7 @@ export default function MulticotizadorHome() {
             alignItems: 'center',
             gap: '0.5rem'
           }}>
-            <span>●</span> MSC + Maersk + ONE APIs Conectadas
+            <span>●</span> MSC + Maersk + Hapag + ONE Conectadas
           </div>
           {lastUpdated && (
             <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-subtle)', fontFamily: 'monospace' }}>
@@ -517,13 +518,35 @@ export default function MulticotizadorHome() {
                 </span>
               </div>
 
-              <button
-                onClick={() => setSelectedQuoteModal(rate)}
-                className="btn-primary"
-                style={{ width: '100%', padding: '0.85rem', fontSize: '0.9rem', fontWeight: '700' }}
-              >
-                {rate.hasLiveRate ? '📄 Generar Cotización Cliente' : '📄 Solicitar / Consultar Itinerario'}
-              </button>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <button
+                  onClick={() => setSelectedQuoteModal(rate)}
+                  className="btn-primary"
+                  style={{ padding: '0.85rem 0.5rem', fontSize: '0.85rem', fontWeight: '700' }}
+                >
+                  {rate.hasLiveRate ? '📄 Cotizar' : '📄 Cotización'}
+                </button>
+                <button
+                  onClick={() => setSelectedBookingModal(rate)}
+                  style={{
+                    padding: '0.85rem 0.5rem',
+                    fontSize: '0.85rem',
+                    fontWeight: '700',
+                    background: 'rgba(6, 182, 212, 0.12)',
+                    color: 'var(--accent-cyan)',
+                    border: '1px solid rgba(6, 182, 212, 0.35)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  ⚓ Pre-Booking
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -673,6 +696,247 @@ _Operado por Almar Rosario SRL - Freight Intelligence._`)}
                 onClick={() => setSelectedQuoteModal(null)}
                 className="btn-secondary"
                 style={{ padding: '0.85rem 1.5rem', fontSize: '0.9rem', fontWeight: '700' }}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DCSA Booking Modal Dialog */}
+      {selectedBookingModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(3, 7, 18, 0.88)',
+          backdropFilter: 'blur(12px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1.5rem',
+          zIndex: 1000
+        }}>
+          <div className="glass-panel" style={{
+            maxWidth: '680px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '2rem',
+            position: 'relative',
+            background: 'var(--bg-card)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
+          }}>
+            <button
+              onClick={() => setSelectedBookingModal(null)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid var(--border-subtle)',
+                color: 'var(--text-muted)',
+                borderRadius: '8px',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              ✕
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+              <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #06b6d4, #2563eb)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: 'white', fontSize: '1.2rem' }}>
+                ⚓
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'white', margin: 0 }}>
+                  Solicitud de Reserva / Pre-Booking DCSA
+                </h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
+                  Estándar Digital Container Shipping Association (DCSA Booking v2)
+                </p>
+              </div>
+            </div>
+
+            {/* Carrier & Gateway Status Notice */}
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.85)',
+              padding: '1.25rem',
+              borderRadius: '10px',
+              border: '1px solid var(--border-subtle)',
+              marginBottom: '1.25rem',
+              fontSize: '0.85rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                <span style={{ fontWeight: '700', color: 'white', fontSize: '0.95rem' }}>
+                  {selectedBookingModal.carrier} • {selectedBookingModal.serviceName}
+                </span>
+                <span style={{
+                  background: selectedBookingModal.carrier === 'Maersk' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                  color: selectedBookingModal.carrier === 'Maersk' ? '#facc15' : '#10b981',
+                  border: `1px solid ${selectedBookingModal.carrier === 'Maersk' ? 'rgba(234, 179, 8, 0.4)' : 'rgba(16, 185, 129, 0.4)'}`,
+                  padding: '0.2rem 0.6rem',
+                  borderRadius: '12px',
+                  fontSize: '0.72rem',
+                  fontWeight: '800'
+                }}>
+                  {selectedBookingModal.carrier === 'Maersk' ? '🟡 Ocean Booking v2 [DCSA] en revisión' : selectedBookingModal.carrier === 'Hapag-Lloyd' ? '🟡 Tryout Activo / Requiere Aprobación Comercial' : '🟢 Gateway Operativo'}
+                </span>
+              </div>
+
+              <div style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.82rem' }}>
+                <p style={{ margin: '0.2rem 0' }}>📍 <strong>Ruta:</strong> {polObj.name} ({pol}) ➔ {podObj.name} ({pod})</p>
+                <p style={{ margin: '0.2rem 0' }}>🛳️ <strong>Buque & Viaje Asignado:</strong> {selectedBookingModal.vessel}</p>
+                <p style={{ margin: '0.2rem 0' }}>📦 <strong>Equipo Solicitado:</strong> {equipment} (ISO: {equipment === "40'HC" ? '45G1' : equipment === "20'DC" ? '22G1' : '42G1'})</p>
+                {selectedBookingModal.partyId && (
+                  <p style={{ margin: '0.2rem 0' }}>🏢 <strong>Identificador Almar (Party ID):</strong> {selectedBookingModal.partyId}</p>
+                )}
+              </div>
+            </div>
+
+            {/* DCSA Payload Preview */}
+            <div style={{ marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--accent-cyan)' }}>
+                  ⚙️ PAYLOAD DCSA BOOKING V2 (ESTÁNDAR GLOBAL)
+                </span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>
+                  JSON listo para POST /ocean/booking/dcsa/v2/bookings
+                </span>
+              </div>
+              <pre style={{
+                background: '#090d16',
+                padding: '1rem',
+                borderRadius: '8px',
+                border: '1px solid var(--border-subtle)',
+                fontSize: '0.75rem',
+                color: '#38bdf8',
+                overflowX: 'auto',
+                maxHeight: '220px',
+                fontFamily: 'monospace',
+                margin: 0
+              }}>
+{JSON.stringify({
+  receiptTypeAtOrigin: "CY",
+  deliveryTypeAtDestination: "CY",
+  cargoMovementTypeAtOrigin: "FCL",
+  cargoMovementTypeAtDestination: "FCL",
+  serviceContractReference: "ALMAR-CONTRACT-2026",
+  carrierExportVoyageNumber: selectedBookingModal.vessel?.split('/')[1]?.trim() || "638W",
+  placeOfReceipt: { UNLocationCode: pol },
+  placeOfDelivery: { UNLocationCode: pod === 'BUE' ? 'ARBUE' : pod },
+  commodity: {
+    commodityType: "General Cargo",
+    cargoGrossWeight: 22000,
+    cargoGrossWeightUnit: "KGM"
+  },
+  requestedEquipments: [
+    {
+      ISOEquipmentCode: equipment === "40'HC" ? "45G1" : equipment === "20'DC" ? "22G1" : "42G1",
+      units: 1
+    }
+  ],
+  documentParties: [
+    {
+      partyFunction: "DDR",
+      party: {
+        partyName: "ALMAR ROSARIO S.R.L.",
+        identifyingCodes: [
+          {
+            codeListName: `${selectedBookingModal.carrier.toUpperCase()}_PARTY_ID`,
+            codeListProvider: "CARRIER",
+            partyCode: selectedBookingModal.partyId?.split(' ')[0] || "30000026972"
+          }
+        ]
+      }
+    }
+  ]
+}, null, 2)}
+              </pre>
+            </div>
+
+            {/* Next Step Info */}
+            <div style={{
+              background: 'rgba(6, 182, 212, 0.08)',
+              border: '1px solid rgba(6, 182, 212, 0.25)',
+              borderRadius: '8px',
+              padding: '0.75rem 1rem',
+              marginBottom: '1.25rem',
+              fontSize: '0.78rem',
+              color: 'var(--text-main)',
+              lineHeight: '1.5'
+            }}>
+              💡 <strong>¿Qué falta para emisión directa automática?</strong>
+              <div style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                {selectedBookingModal.carrier === 'Maersk' 
+                  ? 'Maersk Developer Portal tiene "Ocean Booking v2 [DCSA]" en estado Pending. En cuanto el equipo comercial apruebe la solución, este botón emitirá la reserva instantáneamente a la terminal de Maersk.'
+                  : selectedBookingModal.carrier === 'Hapag-Lloyd'
+                  ? 'Hapag-Lloyd requiere aprobación de Offers v4 / Booking v2 en api-portal.hlag.com vinculada a la cuenta de crédito de Almar Rosario.'
+                  : 'Para MSC y ONE, se gestiona el envío de la instrucción de reserva pre-formateada vía EDI/Portal comercial.'}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                onClick={() => {
+                  const payload = JSON.stringify({
+                    receiptTypeAtOrigin: "CY",
+                    deliveryTypeAtDestination: "CY",
+                    cargoMovementTypeAtOrigin: "FCL",
+                    cargoMovementTypeAtDestination: "FCL",
+                    serviceContractReference: "ALMAR-CONTRACT-2026",
+                    carrierExportVoyageNumber: selectedBookingModal.vessel?.split('/')[1]?.trim() || "638W",
+                    placeOfReceipt: { UNLocationCode: pol },
+                    placeOfDelivery: { UNLocationCode: pod === 'BUE' ? 'ARBUE' : pod },
+                    commodity: { commodityType: "General Cargo", cargoGrossWeight: 22000, cargoGrossWeightUnit: "KGM" },
+                    requestedEquipments: [{ ISOEquipmentCode: equipment === "40'HC" ? "45G1" : "22G1", units: 1 }],
+                    documentParties: [{ partyFunction: "DDR", party: { partyName: "ALMAR ROSARIO S.R.L.", identifyingCodes: [{ partyCode: selectedBookingModal.partyId?.split(' ')[0] || "30000026972" }] } }]
+                  }, null, 2);
+                  navigator.clipboard.writeText(payload);
+                  alert('📋 ¡Payload DCSA copiado al portapapeles!');
+                }}
+                className="btn-primary"
+                style={{ flex: 1, padding: '0.85rem', fontSize: '0.85rem', fontWeight: '700' }}
+              >
+                📋 Copiar Payload DCSA (JSON)
+              </button>
+
+              <button
+                onClick={() => copyToClipboard(`🚢 *SOLICITUD DE RESERVA DE ESPACIO (PRE-BOOKING)*
+🏢 *Agente:* ALMAR ROSARIO S.R.L.
+🚢 *Naviera:* ${selectedBookingModal.carrier}
+🛳️ *Buque / Viaje:* ${selectedBookingModal.vessel}
+📍 *POL:* ${polObj.name} (${pol})
+🏁 *POD:* ${podObj.name} (${pod})
+📦 *Equipo:* ${equipment}
+📅 *ETD:* ${selectedBookingModal.etd} | 🏁 *ETA:* ${selectedBookingModal.eta}
+${selectedBookingModal.partyId ? `🆔 *Party ID:* ${selectedBookingModal.partyId}\n` : ''}
+_Favor de confirmar reserva y número de Booking oficial._`)}
+                className="btn-secondary"
+                style={{ flex: 1, padding: '0.85rem', fontSize: '0.85rem', fontWeight: '700' }}
+              >
+                📧 Copiar Orden de Reserva
+              </button>
+
+              <button
+                onClick={() => setSelectedBookingModal(null)}
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'white',
+                  borderRadius: '8px',
+                  padding: '0.85rem 1.25rem',
+                  fontSize: '0.85rem',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
               >
                 Cerrar
               </button>
