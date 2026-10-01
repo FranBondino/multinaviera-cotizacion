@@ -148,6 +148,29 @@ export default function MulticotizadorHome() {
               ⏱️ {lastUpdated}
             </span>
           )}
+          <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', { method: 'POST' });
+              window.location.href = '/login';
+            }}
+            style={{
+              background: 'rgba(239, 68, 68, 0.1)',
+              color: '#f87171',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              padding: '0.45rem 0.85rem',
+              borderRadius: '8px',
+              fontSize: '0.8rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              transition: 'all 0.2s'
+            }}
+            title="Cerrar sesión segura"
+          >
+            <span>🔒</span> Salir
+          </button>
         </div>
       </header>
 
