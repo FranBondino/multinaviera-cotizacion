@@ -13,6 +13,10 @@ parse_*.js
 get_*.js
 scratch_*.js
 find_*.js
+extract_*.js
+read_*.js
+scan_*.js
+.agents/
 .DS_Store
 *.log
 
