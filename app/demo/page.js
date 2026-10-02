@@ -103,7 +103,7 @@ export default function DemoPage() {
   const [includeRoadFreight, setIncludeRoadFreight] = useState(false);
   const [sortBy, setSortBy] = useState('cheapest');
   const [clientName, setClientName] = useState('Fundemap S.R.L.');
-  const [activePreset, setActivePreset] = useState('preset-fundemap');
+  const [activePreset, setActivePreset] = useState(null);
 
   // Modal states
   const [modalType, setModalType] = useState(null); // 'cost' | 'whatsapp' | 'pdf' | 'kipintoch' | 'spot'
@@ -122,6 +122,7 @@ export default function DemoPage() {
   // Switch equipment helper to adjust default margin automatically
   const handleEquipmentChange = (newEquip) => {
     setEquipment(newEquip);
+    setActivePreset(null);
     if (newEquip === '20GP') {
       setMarginUSD(200);
     } else if (newEquip === '40HC') {
@@ -131,6 +132,10 @@ export default function DemoPage() {
 
   // Apply quick preset
   const handleSelectPreset = (preset) => {
+    if (!preset) {
+      setActivePreset(null);
+      return;
+    }
     setActivePreset(preset.id);
     setClientName(preset.clientName);
     setOrigin(preset.origin);
@@ -139,7 +144,7 @@ export default function DemoPage() {
     setCargoWeightKg(preset.weightKg);
     setMarginUSD(preset.marginUSD);
     setIncludeRoadFreight(preset.includeRoadFreight);
-    showToast(`🎯 Parámetros cargados: Caso real ${preset.clientName}`);
+    showToast(`🎯 Parámetros cargados: ${preset.clientName}`);
   };
 
   // Determine if origin is Spot (non-Asia)
@@ -329,25 +334,43 @@ export default function DemoPage() {
       {/* 2. Destination Port Selector Chips */}
       <PortSelectorChips
         selectedDestination={selectedDestination}
-        onSelectDestination={setSelectedDestination}
+        onSelectDestination={(dest) => {
+          setSelectedDestination(dest);
+          setActivePreset(null);
+        }}
         includeRoadFreight={includeRoadFreight}
-        onToggleRoadFreight={setIncludeRoadFreight}
+        onToggleRoadFreight={(val) => {
+          setIncludeRoadFreight(val);
+          setActivePreset(null);
+        }}
       />
 
       {/* 3. Parameter & Filter Bar */}
       <FilterBar
         origin={origin}
-        onChangeOrigin={setOrigin}
+        onChangeOrigin={(orig) => {
+          setOrigin(orig);
+          setActivePreset(null);
+        }}
         equipment={equipment}
         onChangeEquipment={handleEquipmentChange}
         cargoWeightKg={cargoWeightKg}
-        onChangeCargoWeight={setCargoWeightKg}
+        onChangeCargoWeight={(w) => {
+          setCargoWeightKg(w);
+          setActivePreset(null);
+        }}
         marginUSD={marginUSD}
-        onChangeMargin={setMarginUSD}
+        onChangeMargin={(m) => {
+          setMarginUSD(m);
+          setActivePreset(null);
+        }}
         sortBy={sortBy}
         onChangeSortBy={setSortBy}
         clientName={clientName}
-        onChangeClientName={setClientName}
+        onChangeClientName={(c) => {
+          setClientName(c);
+          setActivePreset(null);
+        }}
       />
 
       {/* 4. Live Results Header & Metrics Bar */}

@@ -202,15 +202,16 @@ export default function DemoHeader({ activePreset, onSelectPreset, presets = [] 
         {presets.length > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Escenarios Frecuentes:
+              Atajos de prueba (opcionales):
             </span>
             {presets.map((preset) => {
               const isSelected = activePreset === preset.id;
               return (
                 <button
                   key={preset.id}
-                  onClick={() => onSelectPreset && onSelectPreset(preset)}
+                  onClick={() => onSelectPreset && onSelectPreset(isSelected ? null : preset)}
                   type="button"
+                  title="Cargar valores de prueba rápidamente"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
