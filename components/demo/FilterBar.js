@@ -142,14 +142,14 @@ export default function FilterBar({
             <optgroup label="🇨🇳 China / Far East (Tarifarios Eversail W40/W41)">
               {ORIGIN_PORTS.map((p) => (
                 <option key={p.code} value={p.code}>
-                  {p.name} ({p.code}) — {p.fullName}
+                  {p.name} ({p.code})
                 </option>
               ))}
             </optgroup>
             <optgroup label="🌍 Europa, USA & Tráficos Spot (Mesa Operativa)">
               {SPOT_ORIGINS.map((p) => (
                 <option key={p.code} value={p.code}>
-                  {p.name} ({p.code}) — {p.country} [SPOT]
+                  {p.name} ({p.code}) · {p.region}
                 </option>
               ))}
             </optgroup>
@@ -179,10 +179,10 @@ export default function FilterBar({
               fontWeight: 600,
             }}
           >
-            <option value="40HC">40&apos; High Cube (40&apos;HC) — 76.2 CBM / 28.6 Tn</option>
-            <option value="20GP">20&apos; General Purpose (20&apos;GP) — 33.2 CBM / 28.0 Tn</option>
-            <option value="40NOR">40&apos; NOR (Non-Operating Reefer) [Spot/On-Demand]</option>
-            <option value="LCL">LCL Consolidado (Carga Suelta m3/Ton) [Spot MSL]</option>
+            <option value="40HC">40&apos; High Cube (40&apos;HC)</option>
+            <option value="20GP">20&apos; General Purpose (20&apos;GP)</option>
+            <option value="40NOR">40&apos; NOR (Non-Operating Reefer)</option>
+            <option value="LCL">LCL Consolidado (Carga Suelta)</option>
           </select>
         </div>
 
@@ -328,9 +328,9 @@ export default function FilterBar({
               fontWeight: 600,
             }}
           >
-            <option value="cheapest">Más Económico Primero (Menor Tarifa)</option>
-            <option value="fastest">Más Rápido Primero (Menor Transit Time)</option>
-            <option value="best_deal">Recomendado (Balance Costo / Tiempo)</option>
+            <option value="cheapest">Más Económico</option>
+            <option value="fastest">Más Rápido (Menor Tiempo)</option>
+            <option value="best_deal">Recomendado Almar</option>
           </select>
         </div>
       </div>

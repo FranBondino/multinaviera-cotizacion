@@ -91,7 +91,11 @@ export default function RateCard({
     accentColor: 'var(--primary)',
   };
 
-  const isConfirmed = !isSpotRoute && quote.statusBadge?.includes('CONFIRMADA');
+  const isConfirmed = !isSpotRoute && (
+    quote.status === 'CONFIRMED' || 
+    quote.statusBadge?.includes('VIGENTE') || 
+    quote.statusBadge?.includes('CONFIRMADA')
+  );
 
   return (
     <div
@@ -99,11 +103,13 @@ export default function RateCard({
       style={{
         borderRadius: '12px',
         padding: '1.5rem',
+        marginTop: isBestDeal ? '0.75rem' : '0',
         marginBottom: '1.25rem',
         background: 'var(--bg-card)',
         borderColor: isBestDeal ? 'var(--success)' : 'var(--border-subtle)',
         borderWidth: isBestDeal ? '1.5px' : '1px',
         position: 'relative',
+        overflow: 'visible',
         transition: 'all 0.25s ease',
       }}
     >
@@ -111,23 +117,26 @@ export default function RateCard({
       {isBestDeal && (
         <div style={{
           position: 'absolute',
-          top: 0,
-          right: '1.75rem',
-          transform: 'translateY(-50%)',
+          top: '-11px',
+          right: '1.5rem',
+          zIndex: 10,
           background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
           color: '#ffffff',
           fontSize: '0.68rem',
           fontWeight: 800,
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
-          padding: '0.2rem 0.65rem',
+          padding: '0.25rem 0.75rem',
           borderRadius: '9999px',
-          boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)',
-          display: 'flex',
+          boxShadow: '0 3px 10px rgba(16, 185, 129, 0.45)',
+          display: 'inline-flex',
           alignItems: 'center',
-          gap: '0.3rem',
+          gap: '0.35rem',
+          lineHeight: 1,
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none',
         }}>
-          <Sparkles size={11} />
+          <Sparkles size={12} />
           <span>Tarifa Más Económica</span>
         </div>
       )}

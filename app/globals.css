@@ -147,7 +147,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Carrier Card Details */
 .carrier-card {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease;
   background: var(--bg-card);
   z-index: 1;

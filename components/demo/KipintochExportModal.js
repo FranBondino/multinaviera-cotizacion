@@ -237,7 +237,7 @@ export default function KipintochExportModal({ isOpen, onClose, quote, onShowToa
               }}
             >
               <span style={{ color: 'var(--text-dim)' }}>Cliente:</span>
-              <strong style={{ color: 'var(--text-main)', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <strong style={{ color: 'var(--text-main)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {tsvData.fields?.cliente}
               </strong>
               {copiedField === 'Cliente' ? <Check size={14} style={{ color: '#10b981' }} /> : <Copy size={13} />}
