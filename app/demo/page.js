@@ -9,7 +9,6 @@ import CostBreakdownModal from '../../components/demo/CostBreakdownModal';
 import WhatsAppPreviewModal from '../../components/demo/WhatsAppPreviewModal';
 import KipintochExportModal from '../../components/demo/KipintochExportModal';
 import PdfQuoteModal from '../../components/demo/PdfQuoteModal';
-import SpotInquiryModal from '../../components/demo/SpotInquiryModal';
 
 import { 
   getDemoRates, 
@@ -31,7 +30,8 @@ import {
   Clock,
   ShieldCheck,
   Zap,
-  HelpCircle
+  HelpCircle,
+  ExternalLink
 } from 'lucide-react';
 
 // Real commercial presets representing frequent operations
@@ -78,17 +78,6 @@ const OPERATIONAL_PRESETS = [
     equipment: '20GP',
     weightKg: 24500, // Heavy weight
     marginUSD: 200,
-    includeRoadFreight: false,
-  },
-  {
-    id: 'preset-spot-europe',
-    label: 'Hamburgo Spot (Europa / LCL)',
-    clientName: 'Importadora Centro S.R.L.',
-    origin: 'DEHAM',
-    destination: 'ARROS',
-    equipment: '40HC',
-    weightKg: 16000,
-    marginUSD: 300,
     includeRoadFreight: false,
   },
 ];
@@ -147,121 +136,8 @@ export default function DemoPage() {
     showToast(`🎯 Parámetros cargados: ${preset.clientName}`);
   };
 
-  // Determine if origin is Spot (non-Asia)
-  const isSpotOrigin = !['CNSHA', 'CNNGB', 'CNSZX', 'CNTAO', 'CNTXG'].includes(origin) ||
-    equipment === '40NOR' ||
-    equipment === 'LCL';
-
-  // Compute live quotes
+  // Compute live quotes from verified Eversail W40/W41 dataset
   const quotes = useMemo(() => {
-    if (isSpotOrigin) {
-      // Generate realistic assisted Spot Options for European / American / LCL routes
-      const spotVessel = DCSA_VESSELS[0];
-      const destObj = PORT_OPTIONS.find(p => p.code === selectedDestination) || PORT_OPTIONS[0];
-      const isTPR = selectedDestination === 'ARROS';
-
-      const spotMock1 = {
-        quoteNumber: `SPOT-2026-${Math.floor(1100 + Math.random() * 200)}`,
-        clientName,
-        originCode: origin,
-        originName: origin === 'DEHAM' ? 'Hamburgo' : origin === 'ITGOA' ? 'Génova' : origin === 'USCHS' ? 'Charleston' : 'Santos',
-        originFullName: origin,
-        destinationCode: selectedDestination,
-        destinationName: destObj.name,
-        destinationFullName: destObj.fullName,
-        isTPR,
-        isBUE: selectedDestination === 'ARBUE',
-        equipment,
-        equipmentName: equipment === '40HC' ? "40' High Cube" : equipment === '20GP' ? "20' GP" : equipment,
-        carrier: 'Hapag-Lloyd / Consolidadores Europeos',
-        carrierCode: 'HAPAG',
-        carrierColor: '#ea580c',
-        service: 'Atlantic / Mediterranean Express',
-        vessel: 'King of the Seas / 2103N',
-        etd: '2026-10-18',
-        eta: isTPR ? '2026-11-25' : '2026-11-15',
-        cutOff: '2026-10-14',
-        transitTimeText: isTPR ? '38-44 días (vía feeder)' : '28-34 días (directo)',
-        freeDays: 21,
-        cargoWeightKg,
-        appliesHWS: false,
-        validityToText: '15/Oct/2026',
-        statusBadge: '🟡 EN COTIZACIÓN ASISTIDA POR MESA OPERATIVA',
-        isSpot: true,
-        pricing: {
-          baseFreightUSD: equipment === '40HC' ? 4800 : 4200,
-          buyFreeTimeUSD: 100,
-          vesselProtectionUSD: 29,
-          arbitraryFeederUSD: isTPR ? 150 : 0,
-          hwsSurchargeUSD: 0,
-          marginUSD,
-          oceanFreightCostUSD: equipment === '40HC' ? 4929 : 4329,
-          oceanFreightTotalUSD: (equipment === '40HC' ? 4929 : 4329) + marginUSD,
-          agencyFeeUSD: 800,
-          docFeeUSD: 75,
-          docFeeVatUSD: 15.75,
-          peajeHidroviaUSD: isTPR ? 175 : 0,
-          roadFreightUSD: (selectedDestination === 'ARBUE' && includeRoadFreight) ? 700 : 0,
-          insuranceUSD: 0,
-          insuranceVatUSD: 0,
-          destinationChargesTotalUSD: (isTPR ? 1065.75 : 890.75) + ((selectedDestination === 'ARBUE' && includeRoadFreight) ? 700 : 0),
-          grandTotalUSD: ((equipment === '40HC' ? 4929 : 4329) + marginUSD) + (isTPR ? 1065.75 : 890.75) + ((selectedDestination === 'ARBUE' && includeRoadFreight) ? 700 : 0),
-        },
-      };
-
-      const spotMock2 = {
-        quoteNumber: `SPOT-2026-${Math.floor(1300 + Math.random() * 200)}`,
-        clientName,
-        originCode: origin,
-        originName: spotMock1.originName,
-        originFullName: origin,
-        destinationCode: selectedDestination,
-        destinationName: destObj.name,
-        destinationFullName: destObj.fullName,
-        isTPR,
-        isBUE: selectedDestination === 'ARBUE',
-        equipment,
-        equipmentName: spotMock1.equipmentName,
-        carrier: 'MSC (Mediterranean Shipping Co.)',
-        carrierCode: 'MSC',
-        carrierColor: '#1a1a1a',
-        service: 'North West Europe / South America East Coast',
-        vessel: 'MSC CLEA / 2639S',
-        etd: '2026-10-15',
-        eta: isTPR ? '2026-11-22' : '2026-11-12',
-        cutOff: '2026-10-11',
-        transitTimeText: isTPR ? '37-42 días' : '27-32 días',
-        freeDays: 21,
-        cargoWeightKg,
-        appliesHWS: false,
-        validityToText: '15/Oct/2026',
-        statusBadge: '🟡 EN COTIZACIÓN ASISTIDA POR MESA OPERATIVA',
-        isSpot: true,
-        pricing: {
-          baseFreightUSD: equipment === '40HC' ? 4950 : 4350,
-          buyFreeTimeUSD: 100,
-          vesselProtectionUSD: 29,
-          arbitraryFeederUSD: isTPR ? 150 : 0,
-          hwsSurchargeUSD: 0,
-          marginUSD,
-          oceanFreightCostUSD: equipment === '40HC' ? 5079 : 4479,
-          oceanFreightTotalUSD: (equipment === '40HC' ? 5079 : 4479) + marginUSD,
-          agencyFeeUSD: 800,
-          docFeeUSD: 75,
-          docFeeVatUSD: 15.75,
-          peajeHidroviaUSD: isTPR ? 175 : 0,
-          roadFreightUSD: (selectedDestination === 'ARBUE' && includeRoadFreight) ? 700 : 0,
-          insuranceUSD: 0,
-          insuranceVatUSD: 0,
-          destinationChargesTotalUSD: (isTPR ? 1065.75 : 890.75) + ((selectedDestination === 'ARBUE' && includeRoadFreight) ? 700 : 0),
-          grandTotalUSD: ((equipment === '40HC' ? 5079 : 4479) + marginUSD) + (isTPR ? 1065.75 : 890.75) + ((selectedDestination === 'ARBUE' && includeRoadFreight) ? 700 : 0),
-        },
-      };
-
-      return [spotMock1, spotMock2];
-    }
-
-    // Standard Asia trade lanes: query actual Eversail W40/W41 dataset
     const rawQuotes = getDemoRates({
       originCode: origin,
       destinationCode: selectedDestination,
@@ -303,7 +179,6 @@ export default function DemoPage() {
     includeRoadFreight, 
     sortBy, 
     clientName, 
-    isSpotOrigin
   ]);
 
   // Handler to open specific modal
@@ -422,13 +297,11 @@ export default function DemoPage() {
           <RateCard
             key={quote.quoteNumber || index}
             quote={quote}
-            isBestDeal={index === 0 && !isSpotOrigin}
-            isSpotRoute={isSpotOrigin}
+            isBestDeal={index === 0}
             onOpenCostBreakdown={(q) => handleOpenModal('cost', q)}
             onOpenWhatsApp={(q) => handleOpenModal('whatsapp', q)}
             onOpenPdf={(q) => handleOpenModal('pdf', q)}
             onOpenKipintoch={(q) => handleOpenModal('kipintoch', q)}
-            onOpenSpotInquiry={(q) => handleOpenModal('spot', q)}
           />
         ))}
 
@@ -440,19 +313,43 @@ export default function DemoPage() {
           }}>
             <AlertCircle size={36} style={{ color: '#f59e0b', margin: '0 auto 0.75rem auto' }} />
             <h4 style={{ fontSize: '1.1rem', color: 'var(--text-main)', marginBottom: '0.35rem' }}>
-              No se encontraron itinerarios directos para este tráfico
+              Ruta no disponible en tarifario consolidado semanal
             </h4>
-            <p style={{ fontSize: '0.82rem', maxWidth: '480px', margin: '0 auto 1.25rem auto' }}>
-              La combinación seleccionada requiere cotización personalizada con la Mesa Operativa de Pricing.
+            <p style={{ fontSize: '0.85rem', maxWidth: '540px', margin: '0 auto 1.5rem auto', lineHeight: 1.5 }}>
+              Para corredores fuera de Asia (Europa, EE.UU. o cargas especiales), las tarifas no se reciben en listas fijas semanales; se consultan directamente en el portal oficial de cada naviera con la cuenta comercial de Almar.
             </p>
-            <button
-              type="button"
-              onClick={() => handleOpenModal('spot', calculateQuote({ originCode: origin, destinationCode: selectedDestination, equipment, clientName }))}
-              className="btn-primary"
-              style={{ fontSize: '0.85rem' }}
-            >
-              Solicitar Cotización Spot a Pricing
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <a
+                href="https://www.maersk.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+                style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem' }}
+              >
+                <span>Portal Maersk Spot</span>
+                <ExternalLink size={13} />
+              </a>
+              <a
+                href="https://www.hapag-lloyd.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+                style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem' }}
+              >
+                <span>Hapag Quick Quotes</span>
+                <ExternalLink size={13} />
+              </a>
+              <a
+                href="https://www.msc.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+                style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem' }}
+              >
+                <span>Portal myMSC</span>
+                <ExternalLink size={13} />
+              </a>
+            </div>
           </div>
         )}
       </div>
@@ -482,13 +379,6 @@ export default function DemoPage() {
         isOpen={modalType === 'pdf'}
         onClose={handleCloseModal}
         quote={activeQuote}
-      />
-
-      <SpotInquiryModal
-        isOpen={modalType === 'spot'}
-        onClose={handleCloseModal}
-        quote={activeQuote}
-        onShowToast={showToast}
       />
 
       {/* 7. Toast Notification Floating Banner */}

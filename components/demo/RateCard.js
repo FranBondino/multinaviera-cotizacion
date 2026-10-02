@@ -73,12 +73,10 @@ const CARRIER_THEMES = {
 export default function RateCard({
   quote,
   isBestDeal = false,
-  isSpotRoute = false,
   onOpenCostBreakdown,
   onOpenWhatsApp,
   onOpenPdf,
   onOpenKipintoch,
-  onOpenSpotInquiry,
 }) {
   if (!quote) return null;
 
@@ -91,11 +89,9 @@ export default function RateCard({
     accentColor: 'var(--primary)',
   };
 
-  const isConfirmed = !isSpotRoute && (
-    quote.status === 'CONFIRMED' || 
+  const isConfirmed = quote.status === 'CONFIRMED' || 
     quote.statusBadge?.includes('VIGENTE') || 
-    quote.statusBadge?.includes('CONFIRMADA')
-  );
+    quote.statusBadge?.includes('CONFIRMADA');
 
   return (
     <div
@@ -526,47 +522,23 @@ export default function RateCard({
           </button>
         </div>
 
-        {/* Right: Spot Route or Reserve Button */}
+        {/* Right: Proposal Button */}
         <div>
-          {isSpotRoute ? (
-            <button
-              type="button"
-              onClick={() => onOpenSpotInquiry && onOpenSpotInquiry(quote)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                padding: '0.5rem 1rem',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
-                color: '#000000',
-                border: 'none',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.25)',
-              }}
-            >
-              <Send size={14} />
-              <span>Solicitar Cotización Spot</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => onOpenWhatsApp && onOpenWhatsApp(quote)}
-              className="btn-primary"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                fontSize: '0.82rem',
-                padding: '0.5rem 1.1rem',
-              }}
-            >
-              <span>Generar Propuesta</span>
-              <ChevronRight size={15} />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => onOpenWhatsApp && onOpenWhatsApp(quote)}
+            className="btn-primary"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              fontSize: '0.82rem',
+              padding: '0.5rem 1.1rem',
+            }}
+          >
+            <span>Generar Propuesta</span>
+            <ChevronRight size={15} />
+          </button>
         </div>
       </div>
     </div>

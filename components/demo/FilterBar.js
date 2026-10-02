@@ -14,13 +14,7 @@ import {
 } from 'lucide-react';
 import { ORIGIN_PORTS, EQUIPMENT_OPTIONS } from '../../lib/demoData';
 
-// Additional Spot Origins for Europe / USA / LATAM
-const SPOT_ORIGINS = [
-  { code: 'DEHAM', name: 'Hamburgo', country: 'Alemania 🇩🇪', region: 'Europa Norte', spot: true },
-  { code: 'ITGOA', name: 'Génova', country: 'Italia 🇮🇹', region: 'Mediterráneo', spot: true },
-  { code: 'USCHS', name: 'Charleston', country: 'EEUU 🇺🇸', region: 'Norteamérica', spot: true },
-  { code: 'BRSSZ', name: 'Santos', country: 'Brasil 🇧🇷', region: 'Sudamérica', spot: true },
-];
+
 
 export default function FilterBar({
   origin = 'CNNGB',
@@ -139,20 +133,11 @@ export default function FilterBar({
               fontWeight: 600,
             }}
           >
-            <optgroup label="🇨🇳 China / Far East (Tarifarios Eversail W40/W41)">
-              {ORIGIN_PORTS.map((p) => (
-                <option key={p.code} value={p.code}>
-                  {p.name} ({p.code})
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="🌍 Europa, USA & Tráficos Spot (Mesa Operativa)">
-              {SPOT_ORIGINS.map((p) => (
-                <option key={p.code} value={p.code}>
-                  {p.name} ({p.code}) · {p.region}
-                </option>
-              ))}
-            </optgroup>
+            {ORIGIN_PORTS.map((p) => (
+              <option key={p.code} value={p.code}>
+                {p.name} ({p.code}) — {p.country}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -181,8 +166,6 @@ export default function FilterBar({
           >
             <option value="40HC">40&apos; High Cube (40&apos;HC)</option>
             <option value="20GP">20&apos; General Purpose (20&apos;GP)</option>
-            <option value="40NOR">40&apos; NOR (Non-Operating Reefer)</option>
-            <option value="LCL">LCL Consolidado (Carga Suelta)</option>
           </select>
         </div>
 
