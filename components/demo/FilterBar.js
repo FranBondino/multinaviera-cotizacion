@@ -220,6 +220,16 @@ export default function FilterBar({
               kg
             </span>
           </div>
+          <div style={{
+            fontSize: '0.68rem',
+            color: isHWSActive ? '#fbbf24' : 'var(--text-dim)',
+            marginTop: '0.35rem',
+            lineHeight: 1.2,
+          }}>
+            {is20GP 
+              ? (isHWSActive ? '⚠️ Supera 20 tn: Aplica recargo HWS (+USD 200)' : 'Tarifa fija (HWS aplica si > 20 tn)')
+              : 'FCL: Tarifa fija por contenedor (Máx ~28 tn)'}
+          </div>
         </div>
 
         {/* 4. Almar Margin Input */}
