@@ -35,9 +35,9 @@ export default function SpotInquiryModal({ isOpen, onClose, quote, onShowToast }
 
   useEffect(() => {
     if (isOpen && quote) {
-      setClient(quote.clientName || 'Cliente Corporativo Almar');
+      setClient(quote.clientName?.trim() || '');
       const generated = generateSpotTicket({
-        client: quote.clientName || 'Cliente Corporativo Almar',
+        client: quote.clientName?.trim() || 'A designar',
         origin: `${quote.originCode} - ${quote.originName}`,
         destination: `${quote.destinationCode} - ${quote.destinationName}`,
         equipment: quote.equipmentName,

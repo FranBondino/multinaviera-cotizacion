@@ -34,56 +34,8 @@ import {
   ExternalLink
 } from 'lucide-react';
 
-// Real commercial presets representing frequent operations
-const OPERATIONAL_PRESETS = [
-  {
-    id: 'preset-fundemap',
-    label: 'Fundemap (40HC Ningbo TPR)',
-    clientName: 'Fundemap S.R.L.',
-    origin: 'CNNGB',
-    destination: 'ARROS',
-    equipment: '40HC',
-    weightKg: 18500,
-    marginUSD: 250,
-    includeRoadFreight: false,
-  },
-  {
-    id: 'preset-secco',
-    label: 'Secco (20GP Shanghai BUE + Camión)',
-    clientName: 'Industrias Secco S.A.',
-    origin: 'CNSHA',
-    destination: 'ARBUE',
-    equipment: '20GP',
-    weightKg: 22400, // > 20 tn to trigger HWS alert
-    marginUSD: 200,
-    includeRoadFreight: true,
-  },
-  {
-    id: 'preset-disden',
-    label: 'Disden (40HC Shenzhen TPR)',
-    clientName: 'Disden S.A.',
-    origin: 'CNSZX',
-    destination: 'ARROS',
-    equipment: '40HC',
-    weightKg: 19800,
-    marginUSD: 250,
-    includeRoadFreight: false,
-  },
-  {
-    id: 'preset-ternium',
-    label: 'Ternium (20GP Tianjin TPR Heavy)',
-    clientName: 'Ternium Siderar S.A.',
-    origin: 'CNTXG',
-    destination: 'ARROS',
-    equipment: '20GP',
-    weightKg: 24500, // Heavy weight
-    marginUSD: 200,
-    includeRoadFreight: false,
-  },
-];
-
 export default function DemoPage() {
-  // 1. Reactive State
+  // 1. Reactive State (Starts completely neutral with no preset or client pre-filled)
   const [selectedDestination, setSelectedDestination] = useState('ARROS');
   const [origin, setOrigin] = useState('CNNGB');
   const [equipment, setEquipment] = useState('40HC');
@@ -91,8 +43,7 @@ export default function DemoPage() {
   const [marginUSD, setMarginUSD] = useState(250);
   const [includeRoadFreight, setIncludeRoadFreight] = useState(false);
   const [sortBy, setSortBy] = useState('cheapest');
-  const [clientName, setClientName] = useState('Fundemap S.R.L.');
-  const [activePreset, setActivePreset] = useState(null);
+  const [clientName, setClientName] = useState('');
 
   // Modal states
   const [modalType, setModalType] = useState(null); // 'cost' | 'whatsapp' | 'pdf' | 'kipintoch' | 'spot'
@@ -111,29 +62,11 @@ export default function DemoPage() {
   // Switch equipment helper to adjust default margin automatically
   const handleEquipmentChange = (newEquip) => {
     setEquipment(newEquip);
-    setActivePreset(null);
     if (newEquip === '20GP') {
       setMarginUSD(200);
     } else if (newEquip === '40HC') {
       setMarginUSD(250);
     }
-  };
-
-  // Apply quick preset
-  const handleSelectPreset = (preset) => {
-    if (!preset) {
-      setActivePreset(null);
-      return;
-    }
-    setActivePreset(preset.id);
-    setClientName(preset.clientName);
-    setOrigin(preset.origin);
-    setSelectedDestination(preset.destination);
-    setEquipment(preset.equipment);
-    setCargoWeightKg(preset.weightKg);
-    setMarginUSD(preset.marginUSD);
-    setIncludeRoadFreight(preset.includeRoadFreight);
-    showToast(`🎯 Parámetros cargados: ${preset.clientName}`);
   };
 
   // Compute live quotes from verified Eversail W40/W41 dataset
@@ -200,52 +133,30 @@ export default function DemoPage() {
   return (
     <main style={{ maxWidth: '1280px', margin: '0 auto' }}>
       {/* 1. Header */}
-      <DemoHeader
-        activePreset={activePreset}
-        onSelectPreset={handleSelectPreset}
-        presets={OPERATIONAL_PRESETS}
-      />
+      <DemoHeader />
 
       {/* 2. Destination Port Selector Chips */}
       <PortSelectorChips
         selectedDestination={selectedDestination}
-        onSelectDestination={(dest) => {
-          setSelectedDestination(dest);
-          setActivePreset(null);
-        }}
+        onSelectDestination={setSelectedDestination}
         includeRoadFreight={includeRoadFreight}
-        onToggleRoadFreight={(val) => {
-          setIncludeRoadFreight(val);
-          setActivePreset(null);
-        }}
+        onToggleRoadFreight={setIncludeRoadFreight}
       />
 
       {/* 3. Parameter & Filter Bar */}
       <FilterBar
         origin={origin}
-        onChangeOrigin={(orig) => {
-          setOrigin(orig);
-          setActivePreset(null);
-        }}
+        onChangeOrigin={setOrigin}
         equipment={equipment}
         onChangeEquipment={handleEquipmentChange}
         cargoWeightKg={cargoWeightKg}
-        onChangeCargoWeight={(w) => {
-          setCargoWeightKg(w);
-          setActivePreset(null);
-        }}
+        onChangeCargoWeight={setCargoWeightKg}
         marginUSD={marginUSD}
-        onChangeMargin={(m) => {
-          setMarginUSD(m);
-          setActivePreset(null);
-        }}
+        onChangeMargin={setMarginUSD}
         sortBy={sortBy}
         onChangeSortBy={setSortBy}
         clientName={clientName}
-        onChangeClientName={(c) => {
-          setClientName(c);
-          setActivePreset(null);
-        }}
+        onChangeClientName={setClientName}
       />
 
       {/* 4. Live Results Header & Metrics Bar */}

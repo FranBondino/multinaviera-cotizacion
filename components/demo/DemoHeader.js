@@ -12,7 +12,7 @@ import {
   Layers
 } from 'lucide-react';
 
-export default function DemoHeader({ activePreset, onSelectPreset, presets = [] }) {
+export default function DemoHeader() {
   return (
     <header className="glass-panel" style={{
       marginBottom: '1.75rem',
@@ -197,42 +197,6 @@ export default function DemoHeader({ activePreset, onSelectPreset, presets = [] 
             <span>21 Días Libres en Destino</span>
           </div>
         </div>
-
-        {/* Quick Presets for Key Clients */}
-        {presets.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Atajos de prueba (opcionales):
-            </span>
-            {presets.map((preset) => {
-              const isSelected = activePreset === preset.id;
-              return (
-                <button
-                  key={preset.id}
-                  onClick={() => onSelectPreset && onSelectPreset(isSelected ? null : preset)}
-                  type="button"
-                  title="Cargar valores de prueba rápidamente"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '6px',
-                    fontSize: '0.72rem',
-                    fontWeight: isSelected ? 700 : 500,
-                    cursor: 'pointer',
-                    background: isSelected ? 'rgba(6, 182, 212, 0.16)' : 'rgba(255, 255, 255, 0.03)',
-                    border: isSelected ? '1px solid var(--primary)' : '1px solid rgba(255, 255, 255, 0.08)',
-                    color: isSelected ? 'var(--primary)' : 'var(--text-muted)',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  <span>{preset.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
       </div>
     </header>
   );

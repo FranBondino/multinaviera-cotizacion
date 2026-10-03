@@ -219,7 +219,7 @@ export default function PdfQuoteModal({ isOpen, onClose, quote }) {
                 Cliente / Razón Social:
               </div>
               <div style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', marginTop: '0.15rem' }}>
-                {quote.clientName || 'Cliente Corporativo Almar'}
+                {quote.clientName?.trim() || 'A designar / Cliente'}
               </div>
               <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.15rem' }}>
                 Atn: Departamento de Comercio Exterior / Compras

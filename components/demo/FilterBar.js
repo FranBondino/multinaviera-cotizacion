@@ -27,7 +27,7 @@ export default function FilterBar({
   onChangeMargin,
   sortBy = 'cheapest',
   onChangeSortBy,
-  clientName = 'Fundemap S.R.L.',
+  clientName = '',
   onChangeClientName,
 }) {
   const is20GP = equipment === '20GP';
@@ -89,7 +89,7 @@ export default function FilterBar({
             type="text"
             value={clientName}
             onChange={(e) => onChangeClientName && onChangeClientName(e.target.value)}
-            placeholder="Empresa cliente..."
+            placeholder="Nombre de la empresa (opcional)..."
             style={{
               background: 'transparent',
               border: 'none',
@@ -97,7 +97,7 @@ export default function FilterBar({
               color: 'var(--text-main)',
               fontSize: '0.8rem',
               fontWeight: 600,
-              width: '160px',
+              width: '210px',
             }}
           />
         </div>
