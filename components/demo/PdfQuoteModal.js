@@ -271,9 +271,11 @@ export default function PdfQuoteModal({ isOpen, onClose, quote }) {
                 {/* 1. Ocean Freight */}
                 <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
                   <td style={{ padding: '0.65rem 0.75rem', color: '#0f172a' }}>
-                    <strong>Flete Internacional Marítimo</strong><br />
+                    <strong>Flete Internacional Marítimo {quote.isSpot ? '(Tarifa Spot Naviera)' : ''}</strong><br />
                     <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                      Incluye Vessel Protection (VP) y <strong>{quote.freeDays} días libres de estadía</strong> en destino
+                      {quote.isSpot
+                        ? `Itinerario oficial DCSA (${quote.vessel}). Tarifa a cotizar en portal ${quote.portalName}. ${quote.freeDays}`
+                        : `Incluye Vessel Protection (VP) y ${quote.freeDays} días libres de estadía en destino`}
                     </span>
                   </td>
                   <td style={{ textAlign: 'center', padding: '0.65rem', color: '#475569' }}>
@@ -282,8 +284,8 @@ export default function PdfQuoteModal({ isOpen, onClose, quote }) {
                   <td style={{ textAlign: 'center', padding: '0.65rem', color: '#64748b', fontSize: '0.78rem' }}>
                     Exento
                   </td>
-                  <td style={{ textAlign: 'right', padding: '0.65rem 0.75rem', fontWeight: 700, color: '#0f172a', fontVariantNumeric: 'tabular-nums' }}>
-                    {formatUSD(p.oceanFreightTotalUSD)}
+                  <td style={{ textAlign: 'right', padding: '0.65rem 0.75rem', fontWeight: 700, color: quote.isSpot ? '#d97706' : '#0f172a', fontVariantNumeric: 'tabular-nums' }}>
+                    {quote.isSpot ? 'En Portal Naviero' : formatUSD(p.oceanFreightTotalUSD)}
                   </td>
                 </tr>
 
@@ -371,7 +373,9 @@ export default function PdfQuoteModal({ isOpen, onClose, quote }) {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569', marginBottom: '0.25rem' }}>
                 <span>Subtotal Flete de Venta:</span>
-                <span style={{ fontVariantNumeric: 'tabular-nums' }}>USD {formatUSD(p.oceanFreightTotalUSD)}</span>
+                <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  {quote.isSpot ? 'Spot en Portal' : `USD ${formatUSD(p.oceanFreightTotalUSD)}`}
+                </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#475569', marginBottom: '0.35rem' }}>
                 <span>Gastos en Destino (inc. IVA):</span>
@@ -388,7 +392,7 @@ export default function PdfQuoteModal({ isOpen, onClose, quote }) {
               }}>
                 <span>TOTAL PRESUPUESTO:</span>
                 <span style={{ fontVariantNumeric: 'tabular-nums', color: '#0284c7' }}>
-                  USD {formatUSD(p.grandTotalUSD)}
+                  {quote.isSpot ? `USD ${formatUSD(p.destinationChargesTotalUSD)} + Spot` : `USD ${formatUSD(p.grandTotalUSD)}`}
                 </span>
               </div>
             </div>
@@ -406,10 +410,21 @@ export default function PdfQuoteModal({ isOpen, onClose, quote }) {
           }}>
             <div style={{ fontSize: '0.72rem', color: '#64748b', lineHeight: 1.45 }}>
               <strong>CONDICIONES GENERALES:</strong><br />
-              1. Cotización válida hasta el <strong>{quote.validityToText}</strong> sujeta a espacio y disponibilidad de equipo en origen.<br />
-              2. Flete pagadero al tipo de cambio oficial BNA billete vendedor del día previo al pago.<br />
-              3. Días libres: <strong>{quote.freeDays} días libres de estadía de contenedor</strong> en puerto de destino.<br />
-              4. Toda operación está sujeta a las Condiciones Generales de Almar Rosario S.R.L. y de la Asociación de Agentes de Carga (AAACI).
+              {quote.isSpot ? (
+                <>
+                  1. Itinerario oficial DCSA ({quote.vessel}) y gastos locales en Argentina confirmados.<br />
+                  2. Flete marítimo internacional spot a consultar/bloquear en el portal oficial de la naviera ({quote.portalName}).<br />
+                  3. Días libres: <strong>{quote.freeDays}</strong> en puerto de destino.<br />
+                  4. Toda operación está sujeta a las Condiciones Generales de Almar Rosario S.R.L. y de la Asociación de Agentes de Carga (AAACI).
+                </>
+              ) : (
+                <>
+                  1. Cotización válida hasta el <strong>{quote.validityToText}</strong> sujeta a espacio y disponibilidad de equipo en origen.<br />
+                  2. Flete pagadero al tipo de cambio oficial BNA billete vendedor del día previo al pago.<br />
+                  3. Días libres: <strong>{quote.freeDays} días libres de estadía de contenedor</strong> en puerto de destino.<br />
+                  4. Toda operación está sujeta a las Condiciones Generales de Almar Rosario S.R.L. y de la Asociación de Agentes de Carga (AAACI).
+                </>
+              )}
             </div>
 
             <div style={{ textAlign: 'center' }}>

@@ -14,7 +14,8 @@ import {
   Send,
   ChevronRight,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  ExternalLink
 } from 'lucide-react';
 import { formatUSD } from '../../lib/demoData';
 
@@ -333,30 +334,56 @@ export default function RateCard({
           justifyContent: 'center',
           padding: '1rem 1.25rem',
           borderRadius: '10px',
-          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.04) 0%, rgba(0, 0, 0, 0.3) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
+          background: quote.isSpot
+            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(0, 0, 0, 0.3) 100%)'
+            : 'linear-gradient(135deg, rgba(6, 182, 212, 0.04) 0%, rgba(0, 0, 0, 0.3) 100%)',
+          border: quote.isSpot
+            ? '1px solid rgba(245, 158, 11, 0.25)'
+            : '1px solid rgba(255, 255, 255, 0.05)',
         }}>
-          {/* Flete Venta */}
-          <div style={{ textAlign: 'right', marginBottom: '0.4rem' }}>
-            <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Flete Internacional Venta
-            </span>
-            <div style={{
-              fontSize: '1.65rem',
-              fontWeight: 800,
-              color: 'var(--text-main)',
-              fontVariantNumeric: 'tabular-nums',
-              fontFamily: 'var(--font-heading)',
-              lineHeight: 1.1,
-            }}>
-              USD {formatUSD(quote.pricing.oceanFreightTotalUSD)}
+          {quote.isSpot ? (
+            /* Flete Spot */
+            <div style={{ textAlign: 'right', marginBottom: '0.4rem' }}>
+              <span style={{ fontSize: '0.72rem', color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
+                Flete Internacional Spot
+              </span>
+              <div style={{
+                fontSize: '1.25rem',
+                fontWeight: 800,
+                color: '#fbbf24',
+                fontFamily: 'var(--font-heading)',
+                lineHeight: 1.2,
+                marginTop: '0.2rem',
+              }}>
+                En Portal Naviero
+              </div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+                Tarifa en vivo con login en {quote.portalName}
+              </span>
             </div>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
-              Por 1x {quote.equipmentName} (inc. Margen Almar USD {quote.pricing.marginUSD})
-            </span>
-          </div>
+          ) : (
+            /* Flete Venta Estándar */
+            <div style={{ textAlign: 'right', marginBottom: '0.4rem' }}>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Flete Internacional Venta
+              </span>
+              <div style={{
+                fontSize: '1.65rem',
+                fontWeight: 800,
+                color: 'var(--text-main)',
+                fontVariantNumeric: 'tabular-nums',
+                fontFamily: 'var(--font-heading)',
+                lineHeight: 1.1,
+              }}>
+                USD {formatUSD(quote.pricing.oceanFreightTotalUSD)}
+              </div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+                Por 1x {quote.equipmentName} (inc. Margen Almar USD {quote.pricing.marginUSD})
+              </span>
+            </div>
+          )}
 
-          {/* Total Landed Presupuesto (flete + locales) */}
+          {/* Total Landed Presupuesto (o Gastos Locales Confirmados si Spot) */}
           <div style={{
             textAlign: 'right',
             paddingTop: '0.45rem',
@@ -370,18 +397,20 @@ export default function RateCard({
               gap: '1rem',
             }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Total Landed Estimado:
+                {quote.isSpot ? 'Gastos Locales en Destino:' : 'Total Landed Estimado:'}
               </span>
               <strong style={{
                 fontSize: '1.05rem',
                 color: 'var(--primary)',
                 fontVariantNumeric: 'tabular-nums',
               }}>
-                USD {formatUSD(quote.pricing.grandTotalUSD)}
+                USD {formatUSD(quote.pricing.destinationChargesTotalUSD)}
               </strong>
             </div>
             <div style={{ fontSize: '0.67rem', color: 'var(--text-dim)', marginTop: '0.1rem' }}>
-              Incluye gastos locales en destino ({quote.destinationName}) + IVA
+              {quote.isSpot 
+                ? `Agencia + Doc Fee${quote.isTPR ? ' + Peaje Hidrovía' : ''} (100% confirmado en Argentina)`
+                : `Incluye gastos locales en destino (${quote.destinationName}) + IVA`}
             </div>
           </div>
         </div>
@@ -522,23 +551,47 @@ export default function RateCard({
           </button>
         </div>
 
-        {/* Right: Proposal Button */}
+        {/* Right: Proposal Button or Direct Portal Link */}
         <div>
-          <button
-            type="button"
-            onClick={() => onOpenWhatsApp && onOpenWhatsApp(quote)}
-            className="btn-primary"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              fontSize: '0.82rem',
-              padding: '0.5rem 1.1rem',
-            }}
-          >
-            <span>Generar Propuesta</span>
-            <ChevronRight size={15} />
-          </button>
+          {quote.isSpot ? (
+            <a
+              href={quote.portalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                fontSize: '0.82rem',
+                padding: '0.5rem 1.1rem',
+                background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+                color: '#ffffff',
+                textDecoration: 'none',
+                border: 'none',
+                boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)',
+              }}
+            >
+              <span>Cotizar en {quote.portalName}</span>
+              <ExternalLink size={15} />
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onOpenWhatsApp && onOpenWhatsApp(quote)}
+              className="btn-primary"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.82rem',
+                padding: '0.5rem 1.1rem',
+              }}
+            >
+              <span>Generar Propuesta</span>
+              <ChevronRight size={15} />
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -84,7 +84,9 @@ export default function DemoPage() {
     // Apply sorting
     const sorted = [...rawQuotes].sort((a, b) => {
       if (sortBy === 'cheapest') {
-        return a.pricing.oceanFreightTotalUSD - b.pricing.oceanFreightTotalUSD;
+        const valA = a.pricing.oceanFreightTotalUSD ?? a.pricing.destinationChargesTotalUSD;
+        const valB = b.pricing.oceanFreightTotalUSD ?? b.pricing.destinationChargesTotalUSD;
+        return valA - valB;
       }
       if (sortBy === 'fastest') {
         const getDays = (q) => {
@@ -95,8 +97,10 @@ export default function DemoPage() {
       }
       if (sortBy === 'best_deal') {
         // Maersk or ONE preferred
-        const scoreA = (a.carrierCode === 'MSK' ? 10 : 0) - a.pricing.oceanFreightTotalUSD / 1000;
-        const scoreB = (b.carrierCode === 'MSK' ? 10 : 0) - b.pricing.oceanFreightTotalUSD / 1000;
+        const freightA = a.pricing.oceanFreightTotalUSD ?? 5000;
+        const freightB = b.pricing.oceanFreightTotalUSD ?? 5000;
+        const scoreA = (a.carrierCode === 'MSK' ? 10 : 0) - freightA / 1000;
+        const scoreB = (b.carrierCode === 'MSK' ? 10 : 0) - freightB / 1000;
         return scoreB - scoreA;
       }
       return 0;
@@ -127,7 +131,7 @@ export default function DemoPage() {
 
   // Metrics summary
   const lowestRate = quotes.length > 0
-    ? Math.min(...quotes.map(q => q.pricing.oceanFreightTotalUSD))
+    ? Math.min(...quotes.map(q => q.pricing.oceanFreightTotalUSD).filter(v => v !== null && !isNaN(v)))
     : 0;
 
   return (
@@ -176,7 +180,7 @@ export default function DemoPage() {
           <Ship size={18} style={{ color: 'var(--primary)' }} />
           <div>
             <h3 style={{ fontSize: '0.92rem', fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>
-              {quotes.length} Alternativas Oficiales Disponibles
+              {quotes.length} {quotes[0]?.isSpot ? 'Salidas Oficiales DCSA Disponibles' : 'Alternativas Oficiales Disponibles'}
             </h3>
             <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
               Ruta: {quotes[0]?.originName} ({origin}) ➔ {quotes[0]?.destinationName} ({selectedDestination}) · 1x {equipment}
@@ -186,19 +190,39 @@ export default function DemoPage() {
 
         {/* Quick summary stats */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Tarifa Mínima Venta</span>
-            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#10b981', fontVariantNumeric: 'tabular-nums' }}>
-              USD {formatUSD(lowestRate)}
-            </div>
-          </div>
+          {quotes[0]?.isSpot ? (
+            <>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.68rem', color: '#f59e0b', textTransform: 'uppercase', fontWeight: 700 }}>Modalidad Comercial</span>
+                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#fbbf24' }}>
+                  Tarifa Spot en Portal Naviero
+                </div>
+              </div>
 
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Días Libres en Destino</span>
-            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#38bdf8' }}>
-              21 Días Libres
-            </div>
-          </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Gastos Locales en Destino</span>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#38bdf8', fontVariantNumeric: 'tabular-nums' }}>
+                  USD {formatUSD(quotes[0]?.pricing?.destinationChargesTotalUSD)} (Confirmados)
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Tarifa Mínima Venta</span>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#10b981', fontVariantNumeric: 'tabular-nums' }}>
+                  USD {formatUSD(lowestRate)}
+                </div>
+              </div>
+
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Días Libres en Destino</span>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#38bdf8' }}>
+                  21 Días Libres
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -208,7 +232,7 @@ export default function DemoPage() {
           <RateCard
             key={quote.quoteNumber || index}
             quote={quote}
-            isBestDeal={index === 0}
+            isBestDeal={index === 0 && !quote.isSpot}
             onOpenCostBreakdown={(q) => handleOpenModal('cost', q)}
             onOpenWhatsApp={(q) => handleOpenModal('whatsapp', q)}
             onOpenPdf={(q) => handleOpenModal('pdf', q)}

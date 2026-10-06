@@ -158,87 +158,146 @@ export default function CostBreakdownModal({ isOpen, onClose, quote }) {
             borderRadius: '8px',
             padding: '0.75rem 1rem',
           }}>
-            {/* Base Freight */}
-            <div className="detail-row">
-              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                Flete Base de Compra Naviera (Eversail W40/W41)
-              </span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                USD {formatUSD(p.baseFreightUSD)}
-              </span>
-            </div>
+            {quote.isSpot ? (
+              <>
+                <div className="detail-row">
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    Flete Marítimo Internacional Spot
+                  </span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fbbf24' }}>
+                    Consultar en {quote.portalName}
+                  </span>
+                </div>
+                <div className="detail-row">
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    Portal Oficial de Cotización
+                  </span>
+                  <a
+                    href={quote.portalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontSize: '0.82rem', color: 'var(--primary)', textDecoration: 'underline' }}
+                  >
+                    {quote.portalUrl} ↗
+                  </a>
+                </div>
+                <div className="detail-row">
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    Días Libres en Destino (Free Time)
+                  </span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#10b981' }}>
+                    {quote.freeDays}
+                  </span>
+                </div>
+                <div className="detail-row">
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    Buque y Viaje DCSA Oficial
+                  </span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                    {quote.vessel}
+                  </span>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '0.5rem',
+                  paddingTop: '0.65rem',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                }}>
+                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-main)' }}>
+                    Subtotal Flete Marítimo:
+                  </strong>
+                  <strong style={{ fontSize: '0.95rem', color: '#fbbf24' }}>
+                    Tarifa Spot en Portal Naviero
+                  </strong>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Base Freight */}
+                <div className="detail-row">
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    Flete Base de Compra Naviera (Eversail W40/W41)
+                  </span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                    USD {formatUSD(p.baseFreightUSD)}
+                  </span>
+                </div>
 
-            {/* Buy Free Time */}
-            <div className="detail-row">
-              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span>Buy Free Time ({quote.freeDays} días libres en destino)</span>
-                <span style={{ color: '#10b981', fontSize: '0.7rem' }}>[Incluido]</span>
-              </span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                USD {formatUSD(p.buyFreeTimeUSD)}
-              </span>
-            </div>
+                {/* Buy Free Time */}
+                <div className="detail-row">
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span>Buy Free Time ({quote.freeDays} días libres en destino)</span>
+                    <span style={{ color: '#10b981', fontSize: '0.7rem' }}>[Incluido]</span>
+                  </span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                    USD {formatUSD(p.buyFreeTimeUSD)}
+                  </span>
+                </div>
 
-            {/* Vessel Protection */}
-            <div className="detail-row">
-              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                Vessel Protection (VP / Cobertura Buque)
-              </span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                USD {formatUSD(p.vesselProtectionUSD)}
-              </span>
-            </div>
+                {/* Vessel Protection */}
+                <div className="detail-row">
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    Vessel Protection (VP / Cobertura Buque)
+                  </span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                    USD {formatUSD(p.vesselProtectionUSD)}
+                  </span>
+                </div>
 
-            {/* Arbitrario Feeder Fluvial TPR si aplica */}
-            {quote.isTPR && (
-              <div className="detail-row">
-                <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                  Arbitrario Feeder Fluvial Barcaza a Rosario TPR
-                </span>
-                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)', fontVariantNumeric: 'tabular-nums' }}>
-                  +USD {formatUSD(p.arbitraryFeederUSD || (quote.originCode === 'CNTAO' || quote.originCode === 'CNTXG' ? 200 : 100))}
-                </span>
-              </div>
+                {/* Arbitrario Feeder Fluvial TPR si aplica */}
+                {quote.isTPR && (
+                  <div className="detail-row">
+                    <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                      Arbitrario Feeder Fluvial Barcaza a Rosario TPR
+                    </span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)', fontVariantNumeric: 'tabular-nums' }}>
+                      +USD {formatUSD(p.arbitraryFeederUSD || (quote.originCode === 'CNTAO' || quote.originCode === 'CNTXG' ? 200 : 100))}
+                    </span>
+                  </div>
+                )}
+
+                {/* Heavy Weight Surcharge (HWS) si aplica */}
+                {p.hwsSurchargeUSD > 0 && (
+                  <div className="detail-row" style={{ background: 'rgba(245, 158, 11, 0.08)', margin: '0 -0.5rem', padding: '0.4rem 0.5rem', borderRadius: '4px' }}>
+                    <span style={{ fontSize: '0.82rem', color: '#fbbf24', fontWeight: 600 }}>
+                      ⚠️ Recargo de Sobrepeso (HWS &gt;20tn para 20&apos;GP)
+                    </span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fbbf24', fontVariantNumeric: 'tabular-nums' }}>
+                      +USD {formatUSD(p.hwsSurchargeUSD)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Almar Margin */}
+                <div className="detail-row">
+                  <span style={{ fontSize: '0.82rem', color: '#34d399', fontWeight: 600 }}>
+                    Margen Comercial Bruto Almar Rosario
+                  </span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#34d399', fontVariantNumeric: 'tabular-nums' }}>
+                    +USD {formatUSD(p.marginUSD)}
+                  </span>
+                </div>
+
+                {/* Subtotal Flete Venta */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '0.5rem',
+                  paddingTop: '0.65rem',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                }}>
+                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-main)' }}>
+                    Subtotal Flete Marítimo de Venta:
+                  </strong>
+                  <strong style={{ fontSize: '1.05rem', color: 'var(--text-main)', fontVariantNumeric: 'tabular-nums' }}>
+                    USD {formatUSD(p.oceanFreightTotalUSD)}
+                  </strong>
+                </div>
+              </>
             )}
-
-            {/* Heavy Weight Surcharge (HWS) si aplica */}
-            {p.hwsSurchargeUSD > 0 && (
-              <div className="detail-row" style={{ background: 'rgba(245, 158, 11, 0.08)', margin: '0 -0.5rem', padding: '0.4rem 0.5rem', borderRadius: '4px' }}>
-                <span style={{ fontSize: '0.82rem', color: '#fbbf24', fontWeight: 600 }}>
-                  ⚠️ Recargo de Sobrepeso (HWS &gt;20tn para 20&apos;GP)
-                </span>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fbbf24', fontVariantNumeric: 'tabular-nums' }}>
-                  +USD {formatUSD(p.hwsSurchargeUSD)}
-                </span>
-              </div>
-            )}
-
-            {/* Almar Margin */}
-            <div className="detail-row">
-              <span style={{ fontSize: '0.82rem', color: '#34d399', fontWeight: 600 }}>
-                Margen Comercial Bruto Almar Rosario
-              </span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#34d399', fontVariantNumeric: 'tabular-nums' }}>
-                +USD {formatUSD(p.marginUSD)}
-              </span>
-            </div>
-
-            {/* Subtotal Flete Venta */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '0.5rem',
-              paddingTop: '0.65rem',
-              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-            }}>
-              <strong style={{ fontSize: '0.88rem', color: 'var(--text-main)' }}>
-                Subtotal Flete Marítimo de Venta:
-              </strong>
-              <strong style={{ fontSize: '1.05rem', color: 'var(--text-main)', fontVariantNumeric: 'tabular-nums' }}>
-                USD {formatUSD(p.oceanFreightTotalUSD)}
-              </strong>
-            </div>
           </div>
         </div>
 
@@ -355,13 +414,16 @@ export default function CostBreakdownModal({ isOpen, onClose, quote }) {
         }}>
           <div>
             <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Presupuesto Total Estimado
+              {quote.isSpot ? 'Gastos Locales Confirmados en Destino' : 'Presupuesto Total Estimado'}
             </span>
             <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)', fontVariantNumeric: 'tabular-nums' }}>
-              USD {formatUSD(p.grandTotalUSD)}
+              USD {formatUSD(p.destinationChargesTotalUSD)}
+              {quote.isSpot && <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fbbf24', marginLeft: '0.5rem' }}>+ Flete Spot Naviero</span>}
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
-              (Flete Venta USD {formatUSD(p.oceanFreightTotalUSD)} + Locales USD {formatUSD(p.destinationChargesTotalUSD)})
+              {quote.isSpot
+                ? '(Base de gastos en Argentina 100% calculada al centavo)'
+                : `(Flete Venta USD ${formatUSD(p.oceanFreightTotalUSD)} + Locales USD ${formatUSD(p.destinationChargesTotalUSD)})`}
             </div>
           </div>
 
@@ -383,7 +445,11 @@ export default function CostBreakdownModal({ isOpen, onClose, quote }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.74rem', color: 'var(--text-dim)' }}>
             <Info size={14} style={{ color: 'var(--primary)' }} />
-            <span>Tarifario oficial Eversail Logistics Inc. verificado para la Semana 40/41.</span>
+            <span>
+              {quote.isSpot
+                ? `Itinerario oficial DCSA verificado con naviera directa (${quote.carrier}). Flete spot sujeto a cotización en portal.`
+                : 'Tarifario oficial Eversail Logistics Inc. verificado para la Semana 40/41.'}
+            </span>
           </div>
 
           <button

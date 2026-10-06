@@ -133,11 +133,20 @@ export default function FilterBar({
               fontWeight: 600,
             }}
           >
-            {ORIGIN_PORTS.map((p) => (
-              <option key={p.code} value={p.code}>
-                {p.name} ({p.code}) — {p.country}
-              </option>
-            ))}
+            <optgroup label="🇨🇳 China / Lejano Oriente (Tarifario FCL Semanal)">
+              {ORIGIN_PORTS.filter(p => !p.isSpot).map((p) => (
+                <option key={p.code} value={p.code}>
+                  {p.name} ({p.code}) — {p.country}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label="🌐 Europa / EE.UU. / LATAM (Itinerarios DCSA // Tarifa Spot)">
+              {ORIGIN_PORTS.filter(p => p.isSpot).map((p) => (
+                <option key={p.code} value={p.code}>
+                  {p.name} ({p.code}) — {p.country}
+                </option>
+              ))}
+            </optgroup>
           </select>
         </div>
 
