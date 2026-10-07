@@ -5,6 +5,7 @@ import DemoHeader from '../../components/demo/DemoHeader';
 import PortSelectorChips from '../../components/demo/PortSelectorChips';
 import FilterBar from '../../components/demo/FilterBar';
 import RateCard from '../../components/demo/RateCard';
+import RateListView from '../../components/demo/RateListView';
 import CostBreakdownModal from '../../components/demo/CostBreakdownModal';
 import WhatsAppPreviewModal from '../../components/demo/WhatsAppPreviewModal';
 import KipintochExportModal from '../../components/demo/KipintochExportModal';
@@ -16,7 +17,8 @@ import {
   formatUSD, 
   ORIGIN_PORTS, 
   PORT_OPTIONS,
-  DCSA_VESSELS
+  DCSA_VESSELS,
+  AVAILABLE_AGENTS
 } from '../../lib/demoData';
 
 import { 
@@ -31,7 +33,10 @@ import {
   ShieldCheck,
   Zap,
   HelpCircle,
-  ExternalLink
+  ExternalLink,
+  List,
+  LayoutGrid,
+  Users
 } from 'lucide-react';
 
 export default function DemoPage() {
@@ -44,6 +49,8 @@ export default function DemoPage() {
   const [includeRoadFreight, setIncludeRoadFreight] = useState(false);
   const [sortBy, setSortBy] = useState('cheapest');
   const [clientName, setClientName] = useState('');
+  const [viewMode, setViewMode] = useState('list'); // 'list' | 'cards' (Formato Lista por defecto)
+  const [agentFilter, setAgentFilter] = useState('ALL'); // 'ALL' | 'AGENT-EVERSAIL' | 'AGENT-TIMEFREIGHT' | 'AGENT-DIRECT'
 
   // Modal states
   const [modalType, setModalType] = useState(null); // 'cost' | 'whatsapp' | 'pdf' | 'kipintoch' | 'spot'
@@ -79,6 +86,7 @@ export default function DemoPage() {
       marginUSD,
       includeRoadFreight,
       clientName,
+      agentFilter,
     });
 
     // Apply sorting
@@ -116,6 +124,7 @@ export default function DemoPage() {
     includeRoadFreight, 
     sortBy, 
     clientName, 
+    agentFilter,
   ]);
 
   // Handler to open specific modal
@@ -163,6 +172,123 @@ export default function DemoPage() {
         onChangeClientName={setClientName}
       />
 
+      {/* 3.1. Sub-Toolbar: Formato de Visualización & Filtro de Agentes */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '0.75rem',
+        marginBottom: '0.85rem',
+        padding: '0.65rem 1rem',
+        borderRadius: '10px',
+        background: 'rgba(255, 255, 255, 0.02)',
+        border: '1px solid var(--border-subtle)',
+      }}>
+        {/* Left: View Mode Toggle (Lista by default) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Formato:
+          </span>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            background: 'rgba(0, 0, 0, 0.35)',
+            padding: '2px',
+            borderRadius: '8px',
+            border: '1px solid var(--border-subtle)',
+          }}>
+            <button
+              type="button"
+              id="btn-view-list"
+              onClick={() => setViewMode('list')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0.4rem 0.75rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: viewMode === 'list' ? 'var(--primary)' : 'transparent',
+                color: viewMode === 'list' ? '#000000' : 'var(--text-muted)',
+                fontWeight: viewMode === 'list' ? 700 : 500,
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <List size={14} />
+              <span>Vista Lista</span>
+            </button>
+            <button
+              type="button"
+              id="btn-view-cards"
+              onClick={() => setViewMode('cards')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0.4rem 0.75rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: viewMode === 'cards' ? 'var(--primary)' : 'transparent',
+                color: viewMode === 'cards' ? '#000000' : 'var(--text-muted)',
+                fontWeight: viewMode === 'cards' ? 700 : 500,
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <LayoutGrid size={14} />
+              <span>Vista Tarjetas</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Right: Agent Selector Filter Chips */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginRight: '0.2rem' }}>
+            <Users size={14} style={{ color: 'var(--text-dim)' }} />
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Agente:
+            </span>
+          </div>
+          {AVAILABLE_AGENTS.map((ag) => {
+            const isSelected = agentFilter === ag.id;
+            return (
+              <button
+                key={ag.id}
+                type="button"
+                onClick={() => setAgentFilter(ag.id)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  padding: '0.35rem 0.65rem',
+                  borderRadius: '6px',
+                  border: isSelected ? '1px solid var(--primary)' : '1px solid rgba(255, 255, 255, 0.08)',
+                  background: isSelected ? 'rgba(6, 182, 212, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                  color: isSelected ? 'var(--primary)' : 'var(--text-muted)',
+                  fontSize: '0.75rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span>{ag.shortName}</span>
+                <span style={{
+                  fontSize: '0.65rem',
+                  color: isSelected ? 'var(--text-main)' : 'var(--text-dim)',
+                  opacity: 0.85,
+                }}>
+                  ({ag.share.split(' ')[0]})
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 4. Live Results Header & Metrics Bar */}
       <div style={{
         display: 'flex',
@@ -184,6 +310,7 @@ export default function DemoPage() {
             </h3>
             <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
               Ruta: {quotes[0]?.originName} ({origin}) ➔ {quotes[0]?.destinationName} ({selectedDestination}) · 1x {equipment}
+              {agentFilter !== 'ALL' && ` · Filtrado: ${AVAILABLE_AGENTS.find(a => a.id === agentFilter)?.name}`}
             </span>
           </div>
         </div>
@@ -226,19 +353,32 @@ export default function DemoPage() {
         </div>
       </div>
 
-      {/* 5. Rate Cards List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {quotes.map((quote, index) => (
-          <RateCard
-            key={quote.quoteNumber || index}
-            quote={quote}
-            isBestDeal={index === 0 && !quote.isSpot}
-            onOpenCostBreakdown={(q) => handleOpenModal('cost', q)}
-            onOpenWhatsApp={(q) => handleOpenModal('whatsapp', q)}
-            onOpenPdf={(q) => handleOpenModal('pdf', q)}
-            onOpenKipintoch={(q) => handleOpenModal('kipintoch', q)}
-          />
-        ))}
+      {/* 5. Results Presentation (List View by default or Card View) */}
+      {quotes.length > 0 && viewMode === 'list' && (
+        <RateListView
+          quotes={quotes}
+          onOpenCostBreakdown={(q) => handleOpenModal('cost', q)}
+          onOpenWhatsApp={(q) => handleOpenModal('whatsapp', q)}
+          onOpenPdf={(q) => handleOpenModal('pdf', q)}
+          onOpenKipintoch={(q) => handleOpenModal('kipintoch', q)}
+        />
+      )}
+
+      {quotes.length > 0 && viewMode === 'cards' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {quotes.map((quote, index) => (
+            <RateCard
+              key={quote.quoteNumber || quote.rateId || index}
+              quote={quote}
+              isBestDeal={index === 0 && !quote.isSpot}
+              onOpenCostBreakdown={(q) => handleOpenModal('cost', q)}
+              onOpenWhatsApp={(q) => handleOpenModal('whatsapp', q)}
+              onOpenPdf={(q) => handleOpenModal('pdf', q)}
+              onOpenKipintoch={(q) => handleOpenModal('kipintoch', q)}
+            />
+          ))}
+        </div>
+      )}
 
         {quotes.length === 0 && (
           <div className="glass-panel" style={{
@@ -285,9 +425,21 @@ export default function DemoPage() {
                 <ExternalLink size={13} />
               </a>
             </div>
+
+            {agentFilter !== 'ALL' && (
+              <div style={{ marginTop: '1.25rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setAgentFilter('ALL')}
+                  className="btn-primary"
+                  style={{ fontSize: '0.8rem', padding: '0.45rem 1rem' }}
+                >
+                  Ver todos los agentes (Quitar filtro actual)
+                </button>
+              </div>
+            )}
           </div>
         )}
-      </div>
 
       {/* 6. Modals */}
       <CostBreakdownModal

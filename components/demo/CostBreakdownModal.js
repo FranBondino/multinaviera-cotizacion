@@ -102,7 +102,7 @@ export default function CostBreakdownModal({ isOpen, onClose, quote }) {
               color: 'var(--text-muted)',
               margin: '0.2rem 0 0 0',
             }}>
-              {quote.carrier} · 1x {quote.equipmentName} · {quote.originName} ➔ {quote.destinationName}
+              {quote.carrier} · {quote.agentBadge || (quote.isSpot ? 'Directo Naviera' : 'Agente: Eversail')} · 1x {quote.equipmentName} · {quote.originName} ➔ {quote.destinationName}
             </p>
           </div>
 
@@ -218,7 +218,7 @@ export default function CostBreakdownModal({ isOpen, onClose, quote }) {
                 {/* Base Freight */}
                 <div className="detail-row">
                   <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                    Flete Base de Compra Naviera (Eversail W40/W41)
+                    Flete Base de Compra Naviera ({quote.agentShort || 'Eversail'} W40/W41)
                   </span>
                   <span style={{ fontSize: '0.85rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
                     USD {formatUSD(p.baseFreightUSD)}
@@ -448,7 +448,7 @@ export default function CostBreakdownModal({ isOpen, onClose, quote }) {
             <span>
               {quote.isSpot
                 ? `Itinerario oficial DCSA verificado con naviera directa (${quote.carrier}). Flete spot sujeto a cotización en portal.`
-                : 'Tarifario oficial Eversail Logistics Inc. verificado para la Semana 40/41.'}
+                : `Tarifario oficial ${quote.agentName || 'Eversail Logistics Inc.'} verificado para la Semana 40/41.`}
             </span>
           </div>
 
